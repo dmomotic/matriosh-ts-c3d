@@ -80,7 +80,7 @@ import "codemirror/mode/javascript/javascript.js";
 // Analizador
 import analizador from "../analizador/gramatica";
 //Traduccion
-//import { Traduccion } from "../traduccion/traduccion";
+import { Traduccion } from "../traduccion/traduccion";
 
 export default {
   components: {
@@ -135,8 +135,30 @@ export default {
       });
     },
     traducir() {
+      if (this.code.trim() == "") {
+        this.notificar("primary", `Ingrese algo de código, por favor`);
+        return;
+      }
+      try {
+        const raizTraduccion = analizador.parse(this.code);
+        //Validación de raiz
+        if (raizTraduccion == null) {
+          this.notificar(
+            "negative",
+            "No fue posible obtener la raíz de la traducción"
+          );
+          return;
+        }
+        let traduccion = new Traduccion(raizTraduccion);
+        this.dot = traduccion.getDot();
+        this.notificar("primary", "Traducción realizada con éxito");
+      } catch (error) {
+        this.notificar("negative", JSON.stringify(error));
+      }
     },
-    limpiar(){},
+    limpiar(){
+      this.code = '';
+    },
     codigoEditado(){}
   },
 };

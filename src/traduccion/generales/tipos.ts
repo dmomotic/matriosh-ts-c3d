@@ -1,0 +1,3 @@
+export const enum TIPO_DATO {
+  STRING, NUMBER, BOOLEAN, TYPE, ARRAY, VOID
+}
