@@ -11,17 +11,17 @@ class Errores {
         }
         return Errores.instance;
     }
-    push(error) {
-        this.lista.push(error);
+    static push(error) {
+        Errores.getInstance().lista.push(error);
     }
-    clear() {
-        this.lista = [];
+    static clear() {
+        Errores.getInstance().lista = [];
     }
-    hasErrors() {
-        return this.lista.length > 0;
+    static hasErrors() {
+        return Errores.getInstance().lista.length > 0;
     }
-    getErrors() {
-        return this.lista;
+    static getErrors() {
+        return Errores.getInstance().lista;
     }
 }
 exports.Errores = Errores;

@@ -1,7 +1,9 @@
 import { TablaSimbolos } from './tablaSimbolos';
 
-export class nodoAST{
-  traducir(ts: TablaSimbolos) : any {
-
+export abstract class NodoAST{
+  constructor(linea: string){
+    Object.assign(this, {linea: +linea});
   }
+
+  abstract traducir(ts: TablaSimbolos) : any;
 }

@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.nodoAST = void 0;
-class nodoAST {
-    traducir(ts) {
+exports.NodoAST = void 0;
+class NodoAST {
+    constructor(linea) {
+        Object.assign(this, { linea: +linea });
     }
 }
-exports.nodoAST = nodoAST;
+exports.NodoAST = NodoAST;

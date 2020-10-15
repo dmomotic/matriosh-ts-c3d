@@ -15,19 +15,19 @@ export class Errores {
     return Errores.instance;
   }
 
-  public push(error: Error): void {
-    this.lista.push(error);
+  public static push(error: Error): void {
+    Errores.getInstance().lista.push(error);
   }
 
-  public clear(): void{
-    this.lista = [];
+  public static clear(): void{
+    Errores.getInstance().lista = [];
   }
 
-  public hasErrors() : boolean{
-    return this.lista.length > 0;
+  public static hasErrors() : boolean{
+    return Errores.getInstance().lista.length > 0;
   }
 
-  public getErrors(): Error[]{
-    return this.lista;
+  public static getErrors(): Error[]{
+    return Errores.getInstance().lista;
   }
 }
