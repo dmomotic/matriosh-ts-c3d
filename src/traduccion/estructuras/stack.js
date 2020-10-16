@@ -16,5 +16,8 @@ class Stack {
     static getAnterior() {
         return Stack.getInstance().index--;
     }
+    static clear() {
+        Stack.getInstance().index = 0;
+    }
 }
 exports.Stack = Stack;

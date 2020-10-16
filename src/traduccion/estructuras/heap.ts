@@ -15,4 +15,12 @@ export class Heap {
     return Heap.getInstance().index++;
   }
 
+  public static getIndex() : number{
+    return Heap.getInstance().index;
+  }
+
+  public static clear() : void{
+    Heap.getInstance().index = 0;
+  }
+
 }

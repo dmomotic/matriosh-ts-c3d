@@ -23,8 +23,13 @@
           <q-separator />
 
           <q-tab-panels v-model="tab" animated>
-            <q-tab-panel name="editor">
-              <codemirror v-model="code" :options="cmOptions" @input="codigoEditado" />
+            <q-tab-panel name="editor" class="row">
+                <div class="col-6 q-pa-sm">
+                  <codemirror v-model="code" :options="cmOptions" @input="codigoEditado" />
+                </div>
+                <div class="col-6 q-pa-sm">
+                  <codemirror v-model="traduccion" :options="cmOptions2" />
+                </div>
             </q-tab-panel>
 
             <q-tab-panel name="errores" v-if="errores != null && errores.length > 0">
@@ -77,6 +82,8 @@ import "codemirror/lib/codemirror.css";
 import "codemirror/theme/paraiso-light.css";
 // import language js
 import "codemirror/mode/javascript/javascript.js";
+// import language clike
+import "codemirror/mode/clike/clike.js";
 // Analizador
 import analizador from "../analizador/gramatica";
 //Traduccion
@@ -91,11 +98,21 @@ export default {
   data() {
     return {
       code: "",
+      traduccion: '',
       cmOptions: {
         tabSize: 4,
         matchBrackets: true,
         styleActiveLine: true,
         mode: "text/javascript",
+        theme: "paraiso-light",
+        lineNumbers: true,
+        line: false,
+      },
+      cmOptions2: {
+        tabSize: 4,
+        matchBrackets: true,
+        styleActiveLine: true,
+        mode: "text/x-csrc",
         theme: "paraiso-light",
         lineNumbers: true,
         line: false,
@@ -140,6 +157,7 @@ export default {
         return;
       }
       try {
+        this.traduccion = '';
         const raizTraduccion = analizador.parse(this.code);
         //Validación de raiz
         if (raizTraduccion == null) {
@@ -151,6 +169,8 @@ export default {
         }
         let traduccion = new Traduccion(raizTraduccion);
         this.dot = traduccion.getDot();
+        const codigo = traduccion.traducir() || '';
+        this.traduccion = beautify_js(codigo, { indent_size: 2 });
         this.notificar("primary", "Traducción realizada con éxito");
       } catch (error) {
         this.notificar("negative", JSON.stringify(error));
@@ -158,6 +178,7 @@ export default {
     },
     limpiar(){
       this.code = '';
+      this.traduccion = '';
     },
     codigoEditado(){}
   },

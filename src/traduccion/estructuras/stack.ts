@@ -18,4 +18,8 @@ export class Stack {
   public static getAnterior() : number{
     return Stack.getInstance().index--;
   }
+
+  public static clear() : void{
+    Stack.getInstance().index = 0;
+  }
 }

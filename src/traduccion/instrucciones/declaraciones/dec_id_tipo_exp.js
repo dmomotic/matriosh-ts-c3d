@@ -16,8 +16,8 @@ class DecIdTipoExp extends nodoAST_1.NodoAST {
     traducir(ts) {
         //Busco en tabla de simbolos
         let variable = ts.getVariable(this.id);
-        //Si la variable no existe es un error
-        if (!variable) {
+        //Si la variable ya existe es un error
+        if (variable) {
             errores_1.Errores.push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `No existe ninguna variable con el id: ${this.id} en este ambito` }));
             return;
         }
@@ -35,11 +35,11 @@ class DecIdTipoExp extends nodoAST_1.NodoAST {
         }
         //Si es una declaracion global
         if (ts.esGlobal()) {
-            codigo3D_1.Codigo3D.addComentario(`INICIO DECLARACION ID: ${this.id}`);
+            codigo3D_1.Codigo3D.addComentario(`INICIO DECLARACION Y ASIGNACION DE ID: ${this.id}`);
             const pos = heap_1.Heap.getSiguiente();
             const temp_pos = temporal_1.Temporal.getSiguiente();
             codigo3D_1.Codigo3D.add(`${temp_pos} = ${pos};`);
-            codigo3D_1.Codigo3D.add(`Heap[ ${temp_pos} ] = ${control_exp.temporal};`);
+            codigo3D_1.Codigo3D.add(`Heap[ (int)${temp_pos} ] = ${control_exp.temporal};`);
             //Registro la variable en la tabla de simbolos
             variable = new variable_1.Variable({ id: this.id, reasignable: this.reasignable, tipo: this.tipo, global: true, inicializado: true, posicion: pos });
             ts.setVariable(variable);

@@ -1,7 +1,15 @@
 import * as _ from 'lodash';
 import { Primitivo } from './expresiones/primitivo';
+import { NodoAST } from './generales/nodoAST';
+import { TablaSimbolos } from './generales/tablaSimbolos';
 import { TIPO_DATO } from "./generales/tipos";
 import { DecIdTipoExp } from './instrucciones/declaraciones/dec_id_tipo_exp';
+import { Temporal } from './generales/temporal';
+import { Etiqueta } from './generales/etiqueta';
+import { Codigo3D } from './generales/codigo3D';
+import { Heap } from './estructuras/heap';
+import { Stack } from './estructuras/stack';
+import { FuncionesPropias } from './utils/funciones_propias';
 
 export class Traduccion {
   raiz: Object;
@@ -12,9 +20,60 @@ export class Traduccion {
     Object.assign(this, { raiz, contador: 0, dot: '' });
   }
 
-  traducir():void {
+  traducir(): string {
+    Stack.clear();
+    Heap.clear();
+    Temporal.clear();
+    Etiqueta.clear();
+    Codigo3D.clear();
     let instrucciones = this.recorrer(this.raiz);
+    const ts_global = new TablaSimbolos();
+    instrucciones.forEach((instruccion : any) => {
+      if(instruccion instanceof NodoAST){
+        instruccion.traducir(ts_global);
+      }
+    });
 
+    this.reservarGlobalesEnHeap();
+    Codigo3D.addInit('void main()\n{');
+    Codigo3D.addInit((new FuncionesPropias()).getCodigo());
+    Codigo3D.add('}');
+    this.generarEncabezado();
+    return Codigo3D.getCodigo();
+  }
+
+  generarEncabezado(): void {
+    let encabezado = '#include <stdio.h>\n\n';
+    encabezado += 'float Heap[16384];\n';
+    encabezado += 'float Stack[16384];\n';
+    encabezado += 'float P;\n';
+    encabezado += 'float H;\n';
+    const ultimo: number = Temporal.getIndex();
+    let temporales = '\n';
+    for(let i: number = 0; i < ultimo; i++){
+      if(i == 0){
+        temporales += 'float ';
+      }
+      temporales += 't'+i;
+      //Si es el ultimo
+      if(i == ultimo - 1){
+        temporales += ';\n'
+      }
+      //Si no es el ultimo
+      else{
+        temporales += ', '
+      }
+    }
+    Codigo3D.addInit(encabezado + temporales);
+  }
+
+  reservarGlobalesEnHeap() : void{
+    const ultimo = Heap.getIndex();
+    let c3d = '/***** Reserva de memoria para variables globales ******/\n';
+    for(let i : number = 0; i < ultimo; i++){
+      c3d += 'H = H + 1;\n';
+    }
+    Codigo3D.addInit(c3d);
   }
 
   getDot(): string {

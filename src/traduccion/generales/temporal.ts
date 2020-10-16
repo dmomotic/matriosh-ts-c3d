@@ -14,4 +14,12 @@ export class Temporal {
   public static getSiguiente() : string{
     return `t${Temporal.getInstance().index++}`;
   }
+
+  public static clear(): void{
+    Temporal.getInstance().index = 0;
+  }
+
+  public static getIndex(): number{
+    return Temporal.getInstance().index;
+  }
 }

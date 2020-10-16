@@ -15,11 +15,19 @@ export class Codigo3D {
     Codigo3D.getInstance().cadena += cadena + '\n';
   }
 
+  public static addInit(cadena: string) : void {
+    Codigo3D.getInstance().cadena = cadena + '\n' + Codigo3D.getInstance().cadena;
+  }
+
   public static addComentario(cadena: string) : void {
     Codigo3D.getInstance().cadena += `/***** ${cadena} ******/\n`;
   }
 
   public static getCodigo(): string{
     return Codigo3D.getInstance().cadena;
+  }
+
+  public static clear(): void{
+    Codigo3D.getInstance().cadena = '';
   }
 }

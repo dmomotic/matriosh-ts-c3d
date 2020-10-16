@@ -3,13 +3,70 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Traduccion = void 0;
 const _ = require("lodash");
 const primitivo_1 = require("./expresiones/primitivo");
+const nodoAST_1 = require("./generales/nodoAST");
+const tablaSimbolos_1 = require("./generales/tablaSimbolos");
 const dec_id_tipo_exp_1 = require("./instrucciones/declaraciones/dec_id_tipo_exp");
+const temporal_1 = require("./generales/temporal");
+const etiqueta_1 = require("./generales/etiqueta");
+const codigo3D_1 = require("./generales/codigo3D");
+const heap_1 = require("./estructuras/heap");
+const stack_1 = require("./estructuras/stack");
+const funciones_propias_1 = require("./utils/funciones_propias");
 class Traduccion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
     }
     traducir() {
+        stack_1.Stack.clear();
+        heap_1.Heap.clear();
+        temporal_1.Temporal.clear();
+        etiqueta_1.Etiqueta.clear();
+        codigo3D_1.Codigo3D.clear();
         let instrucciones = this.recorrer(this.raiz);
+        const ts_global = new tablaSimbolos_1.TablaSimbolos();
+        instrucciones.forEach((instruccion) => {
+            if (instruccion instanceof nodoAST_1.NodoAST) {
+                instruccion.traducir(ts_global);
+            }
+        });
+        this.reservarGlobalesEnHeap();
+        codigo3D_1.Codigo3D.addInit('void main()\n{');
+        codigo3D_1.Codigo3D.addInit((new funciones_propias_1.FuncionesPropias()).getCodigo());
+        codigo3D_1.Codigo3D.add('}');
+        this.generarEncabezado();
+        return codigo3D_1.Codigo3D.getCodigo();
+    }
+    generarEncabezado() {
+        let encabezado = '#include <stdio.h>\n\n';
+        encabezado += 'float Heap[16384];\n';
+        encabezado += 'float Stack[16384];\n';
+        encabezado += 'float P;\n';
+        encabezado += 'float H;\n';
+        const ultimo = temporal_1.Temporal.getIndex();
+        let temporales = '\n';
+        for (let i = 0; i < ultimo; i++) {
+            if (i == 0) {
+                temporales += 'float ';
+            }
+            temporales += 't' + i;
+            //Si es el ultimo
+            if (i == ultimo - 1) {
+                temporales += ';\n';
+            }
+            //Si no es el ultimo
+            else {
+                temporales += ', ';
+            }
+        }
+        codigo3D_1.Codigo3D.addInit(encabezado + temporales);
+    }
+    reservarGlobalesEnHeap() {
+        const ultimo = heap_1.Heap.getIndex();
+        let c3d = '/***** Reserva de memoria para variables globales ******/\n';
+        for (let i = 0; i < ultimo; i++) {
+            c3d += 'H = H + 1;\n';
+        }
+        codigo3D_1.Codigo3D.addInit(c3d);
     }
     getDot() {
         this.contador = 0;

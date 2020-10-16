@@ -13,11 +13,17 @@ class Codigo3D {
     static add(cadena) {
         Codigo3D.getInstance().cadena += cadena + '\n';
     }
+    static addInit(cadena) {
+        Codigo3D.getInstance().cadena = cadena + '\n' + Codigo3D.getInstance().cadena;
+    }
     static addComentario(cadena) {
         Codigo3D.getInstance().cadena += `/***** ${cadena} ******/\n`;
     }
     static getCodigo() {
         return Codigo3D.getInstance().cadena;
+    }
+    static clear() {
+        Codigo3D.getInstance().cadena = '';
     }
 }
 exports.Codigo3D = Codigo3D;

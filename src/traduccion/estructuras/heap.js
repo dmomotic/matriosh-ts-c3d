@@ -13,5 +13,11 @@ class Heap {
     static getSiguiente() {
         return Heap.getInstance().index++;
     }
+    static getIndex() {
+        return Heap.getInstance().index;
+    }
+    static clear() {
+        Heap.getInstance().index = 0;
+    }
 }
 exports.Heap = Heap;

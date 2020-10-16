@@ -14,4 +14,8 @@ export class Etiqueta {
   public static getSiguiente() : string{
     return `L${Etiqueta.getInstance().index++}`;
   }
+
+  public static clear(): void{
+    Etiqueta.getInstance().index = 0;
+  }
 }

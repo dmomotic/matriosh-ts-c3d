@@ -13,5 +13,11 @@ class Temporal {
     static getSiguiente() {
         return `t${Temporal.getInstance().index++}`;
     }
+    static clear() {
+        Temporal.getInstance().index = 0;
+    }
+    static getIndex() {
+        return Temporal.getInstance().index;
+    }
 }
 exports.Temporal = Temporal;
