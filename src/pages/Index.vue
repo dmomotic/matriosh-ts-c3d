@@ -4,6 +4,7 @@
       <div class="col-12">
         <q-btn-group push spread>
           <q-btn push label="Traducir" icon="transform" @click="traducir" />
+          <q-btn push label="Copiar C3D" icon="content_copy" @click="copiar" v-if="showCopyButton"/>
           <q-btn push label="Limpiar" icon="cleaning_services" @click="limpiar" />
         </q-btn-group>
       </div>
@@ -133,6 +134,11 @@ export default {
       ],
     };
   },
+  computed: {
+    showCopyButton(){
+      return this.traduccion != null && this.traduccion.trim().length > 0;
+    }
+  },
   methods: {
     notificar(variant, message) {
       this.$q.notify({
@@ -180,7 +186,11 @@ export default {
       this.code = '';
       this.traduccion = '';
     },
-    codigoEditado(){}
+    codigoEditado(){},
+    copiar(){
+      navigator.clipboard.writeText(this.traduccion);
+      this.notificar('positive', 'El código 3 direcciones ha sido copiado');
+    }
   },
 };
 </script>

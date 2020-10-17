@@ -10,6 +10,8 @@ import { Codigo3D } from './generales/codigo3D';
 import { Heap } from './estructuras/heap';
 import { Stack } from './estructuras/stack';
 import { FuncionesPropias } from './utils/funciones_propias';
+import { Id } from './expresiones/id';
+import { ConsoleLog } from './instrucciones/console_log';
 
 export class Traduccion {
   raiz: Object;
@@ -36,7 +38,7 @@ export class Traduccion {
 
     this.reservarGlobalesEnHeap();
     Codigo3D.addInit('void main()\n{');
-    Codigo3D.addInit((new FuncionesPropias()).getCodigo());
+    //Codigo3D.addInit((new FuncionesPropias()).getCodigo());
     Codigo3D.add('}');
     this.generarEncabezado();
     return Codigo3D.getCodigo();
@@ -69,6 +71,7 @@ export class Traduccion {
 
   reservarGlobalesEnHeap() : void{
     const ultimo = Heap.getIndex();
+
     let c3d = '/***** Reserva de memoria para variables globales ******/\n';
     for(let i : number = 0; i < ultimo; i++){
       c3d += 'H = H + 1;\n';
@@ -221,7 +224,7 @@ export class Traduccion {
           {
             const exp = this.recorrer(nodo.hijos[0]);;
             //Si es un string es una llamada a un id de variable
-            //if (typeof exp == 'string') return new Id(nodo.linea, exp.toString());
+            if (typeof exp == 'string') return new Id(nodo.linea, exp);
 
             //Si es un objeto
             if (exp instanceof Object) return exp;
@@ -232,14 +235,15 @@ export class Traduccion {
     //NUMBER
     else if (this.soyNodo('NUMBER', nodo)) {
       const str_num = nodo.hijos[0];
-      return new Primitivo(nodo.linea, str_num, TIPO_DATO.NUMBER);
+      const tipo = str_num.includes('.') ? TIPO_DATO.FLOAT : TIPO_DATO.INT;
+      return new Primitivo(nodo.linea, str_num, tipo);
     }
 
     //STRING
     else if (this.soyNodo('STRING', nodo)) {
       const str = nodo.hijos[0] as string;
       const str2 = str.substr(1, str.length - 2);
-      //return new Nativo(nodo.linea, str2);
+      return new Primitivo(nodo.linea, str2, TIPO_DATO.STRING);
     }
 
     // BOOLEAN
@@ -248,8 +252,30 @@ export class Traduccion {
     }
 
     //NULL
-    if (this.soyNodo('NULL', nodo)) {
+    else if (this.soyNodo('NULL', nodo)) {
       //return new Nativo(nodo.linea, null);
+    }
+
+    //CONSOLE_LOG
+    else if(this.soyNodo('CONSOLE_LOG', nodo)){
+      //console punto log par_izq LISTA_EXPRESIONES par_der punto_coma
+      const exps = this.recorrer(nodo.hijos[4]);
+      return new ConsoleLog(nodo.linea, exps);
+    }
+
+    //LISTA_EXPRESIONES  ---->  [exp...]
+    else if(this.soyNodo('LISTA_EXPRESIONES', nodo)){
+      const exps: Array<NodoAST> = [];
+      nodo.hijos.forEach((hijo: any) => {
+        if(hijo instanceof Object){
+          const resp = this.recorrer(hijo);
+          //Si es una respuesta valida
+          if(resp){
+            exps.push(resp);
+          }
+        }
+      });
+      return exps;
     }
   }
 

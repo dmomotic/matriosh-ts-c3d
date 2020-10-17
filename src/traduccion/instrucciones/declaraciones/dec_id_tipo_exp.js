@@ -7,6 +7,7 @@ const heap_1 = require("../../estructuras/heap");
 const codigo3D_1 = require("../../generales/codigo3D");
 const nodoAST_1 = require("../../generales/nodoAST");
 const temporal_1 = require("../../generales/temporal");
+const tipos_1 = require("../../generales/tipos");
 const variable_1 = require("../../generales/variable");
 class DecIdTipoExp extends nodoAST_1.NodoAST {
     constructor(linea, reasignable, id, tipo, exp, type_generador = null) {
@@ -28,21 +29,34 @@ class DecIdTipoExp extends nodoAST_1.NodoAST {
             errores_1.Errores.push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `No fue posible obtener los datos necesarios para la expresion en la asignacion del id: ${this.id} ` }));
             return;
         }
-        //Compruebo que el tipo del cual debe ser el id sea igual al tipo retornado en mi control
-        if (this.tipo != control_exp.tipo) {
+        //Compruebo la compatibilidad entre tipos
+        if (!tipos_1.tiposValidos(this.tipo, control_exp.tipo)) {
             errores_1.Errores.push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `El tipo declarado y el tipo asignado del id: ${this.id} no son iguales` }));
             return;
         }
         //Si es una declaracion global
         if (ts.esGlobal()) {
-            codigo3D_1.Codigo3D.addComentario(`INICIO DECLARACION Y ASIGNACION DE ID: ${this.id}`);
-            const pos = heap_1.Heap.getSiguiente();
-            const temp_pos = temporal_1.Temporal.getSiguiente();
-            codigo3D_1.Codigo3D.add(`${temp_pos} = ${pos};`);
-            codigo3D_1.Codigo3D.add(`Heap[ (int)${temp_pos} ] = ${control_exp.temporal};`);
-            //Registro la variable en la tabla de simbolos
-            variable = new variable_1.Variable({ id: this.id, reasignable: this.reasignable, tipo: this.tipo, global: true, inicializado: true, posicion: pos });
-            ts.setVariable(variable);
+            //Si el number
+            if (this.tipo == 1 /* NUMBER */) {
+                codigo3D_1.Codigo3D.addComentario(`Declaracion y asignación de id: ${this.id} tipo number`);
+                const pos = heap_1.Heap.getSiguiente();
+                const temp_pos = temporal_1.Temporal.getSiguiente();
+                codigo3D_1.Codigo3D.add(`${temp_pos} = ${pos};`);
+                codigo3D_1.Codigo3D.add(`Heap[ (int)${temp_pos} ] = ${control_exp.temporal};`);
+                //Registro la variable en la tabla de simbolos
+                variable = new variable_1.Variable({ id: this.id, reasignable: this.reasignable, tipo: control_exp.tipo, global: true, inicializado: true, posicion: pos });
+                ts.setVariable(variable);
+            }
+            //Si es string
+            else if (this.tipo == 0 /* STRING */) {
+                codigo3D_1.Codigo3D.addComentario(`Declaracion y asignación de id: ${this.id} tipo string`);
+                const pos = heap_1.Heap.getSiguiente();
+                const temp_pos = temporal_1.Temporal.getSiguiente();
+                codigo3D_1.Codigo3D.add(`${temp_pos} = ${pos};`);
+                codigo3D_1.Codigo3D.add(`Heap[ (int)${temp_pos} ] = ${control_exp.temporal};`);
+                variable = new variable_1.Variable({ id: this.id, reasignable: this.reasignable, tipo: this.tipo, global: true, inicializado: true, posicion: pos });
+                ts.setVariable(variable);
+            }
         }
         //Si no es una declaracion global
         else {

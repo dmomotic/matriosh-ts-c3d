@@ -11,7 +11,8 @@ const etiqueta_1 = require("./generales/etiqueta");
 const codigo3D_1 = require("./generales/codigo3D");
 const heap_1 = require("./estructuras/heap");
 const stack_1 = require("./estructuras/stack");
-const funciones_propias_1 = require("./utils/funciones_propias");
+const id_1 = require("./expresiones/id");
+const console_log_1 = require("./instrucciones/console_log");
 class Traduccion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
@@ -31,7 +32,7 @@ class Traduccion {
         });
         this.reservarGlobalesEnHeap();
         codigo3D_1.Codigo3D.addInit('void main()\n{');
-        codigo3D_1.Codigo3D.addInit((new funciones_propias_1.FuncionesPropias()).getCodigo());
+        //Codigo3D.addInit((new FuncionesPropias()).getCodigo());
         codigo3D_1.Codigo3D.add('}');
         this.generarEncabezado();
         return codigo3D_1.Codigo3D.getCodigo();
@@ -204,7 +205,8 @@ class Traduccion {
                         const exp = this.recorrer(nodo.hijos[0]);
                         ;
                         //Si es un string es una llamada a un id de variable
-                        //if (typeof exp == 'string') return new Id(nodo.linea, exp.toString());
+                        if (typeof exp == 'string')
+                            return new id_1.Id(nodo.linea, exp);
                         //Si es un objeto
                         if (exp instanceof Object)
                             return exp;
@@ -214,21 +216,42 @@ class Traduccion {
         //NUMBER
         else if (this.soyNodo('NUMBER', nodo)) {
             const str_num = nodo.hijos[0];
-            return new primitivo_1.Primitivo(nodo.linea, str_num, 1 /* NUMBER */);
+            const tipo = str_num.includes('.') ? 7 /* FLOAT */ : 6 /* INT */;
+            return new primitivo_1.Primitivo(nodo.linea, str_num, tipo);
         }
         //STRING
         else if (this.soyNodo('STRING', nodo)) {
             const str = nodo.hijos[0];
             const str2 = str.substr(1, str.length - 2);
-            //return new Nativo(nodo.linea, str2);
+            return new primitivo_1.Primitivo(nodo.linea, str2, 0 /* STRING */);
         }
         // BOOLEAN
         else if (this.soyNodo('BOOLEAN', nodo)) {
             return new primitivo_1.Primitivo(nodo.linea, nodo.hijos[0], 2 /* BOOLEAN */);
         }
         //NULL
-        if (this.soyNodo('NULL', nodo)) {
+        else if (this.soyNodo('NULL', nodo)) {
             //return new Nativo(nodo.linea, null);
+        }
+        //CONSOLE_LOG
+        else if (this.soyNodo('CONSOLE_LOG', nodo)) {
+            //console punto log par_izq LISTA_EXPRESIONES par_der punto_coma
+            const exps = this.recorrer(nodo.hijos[4]);
+            return new console_log_1.ConsoleLog(nodo.linea, exps);
+        }
+        //LISTA_EXPRESIONES  ---->  [exp...]
+        else if (this.soyNodo('LISTA_EXPRESIONES', nodo)) {
+            const exps = [];
+            nodo.hijos.forEach((hijo) => {
+                if (hijo instanceof Object) {
+                    const resp = this.recorrer(hijo);
+                    //Si es una respuesta valida
+                    if (resp) {
+                        exps.push(resp);
+                    }
+                }
+            });
+            return exps;
         }
     }
     /**
