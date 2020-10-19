@@ -4,7 +4,9 @@ import { Codigo3D } from "../generales/codigo3D";
 import { NodoAST } from "../generales/nodoAST";
 import { TablaSimbolos } from "../generales/tablaSimbolos";
 import { Temporal } from "../generales/temporal";
+import { getNombreDeTipo } from "../generales/tipos";
 import { Control } from "../utils/control";
+import { ControlFuncion } from "../utils/control_funcion";
 
 export class Id extends NodoAST{
 
@@ -26,16 +28,22 @@ export class Id extends NodoAST{
 
     //Si es una variable global
     if(variable.isGlobal()){
-      //Si es de tipo numerico
-      if(variable.isNumeric()){
-        Codigo3D.addComentario(`Acceso a la variable global con id: ${variable.id} (numero)`);
+      //Si es de tipo numerico o string o boolean
+      if(variable.isNumeric()  || variable.isString() || variable.isBoolean()){
+        Codigo3D.addComentario(`Acceso a la variable global con id: ${variable.id} (${getNombreDeTipo(variable.tipo)})`);
         const pos = variable.posicion;
         const temp_pos = Temporal.getSiguiente();
         Codigo3D.add(`${temp_pos} = ${pos};`);
         const temp = Temporal.getSiguiente();
         Codigo3D.add(`${temp} = Heap[(int)${temp_pos}];`);
+        //GUARDO EL TEMPORAL
+        ControlFuncion.guardarTemporal(temp);
         return new Control({temporal: temp, tipo: variable.tipo});
       }
+    }
+    //TODO: Si no es una variable global
+    else{
+
     }
   }
 

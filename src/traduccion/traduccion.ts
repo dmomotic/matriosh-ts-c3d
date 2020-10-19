@@ -39,6 +39,7 @@ export class Traduccion {
     this.reservarGlobalesEnHeap();
     Codigo3D.addInit('void main()\n{');
     //Codigo3D.addInit((new FuncionesPropias()).getCodigo());
+    Codigo3D.add('return;');
     Codigo3D.add('}');
     this.generarEncabezado();
     return Codigo3D.getCodigo();
@@ -248,7 +249,8 @@ export class Traduccion {
 
     // BOOLEAN
     else if (this.soyNodo('BOOLEAN', nodo)) {
-      return new Primitivo(nodo.linea, nodo.hijos[0], TIPO_DATO.BOOLEAN);
+      const valor = nodo.hijos[0] == 'true' ? '1' : '0';
+      return new Primitivo(nodo.linea, valor, TIPO_DATO.BOOLEAN);
     }
 
     //NULL

@@ -20,8 +20,14 @@ class Variable {
     isPrimitivo() {
         return this.tipo == 1 /* NUMBER */ || this.tipo == 0 /* STRING */ || this.tipo == 2 /* BOOLEAN */ || this.tipo == 6 /* INT */ || this.tipo == 7 /* FLOAT */;
     }
+    isString() {
+        return this.tipo === 0 /* STRING */;
+    }
     isNumeric() {
         return this.tipo === 6 /* INT */ || this.tipo === 7 /* FLOAT */;
+    }
+    isBoolean() {
+        return this.tipo === 2 /* BOOLEAN */;
     }
 }
 exports.Variable = Variable;

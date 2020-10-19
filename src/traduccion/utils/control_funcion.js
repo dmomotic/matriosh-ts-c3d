@@ -16,16 +16,16 @@ class ControlFuncion {
         tama_o_1.Tamaño.clear();
     }
     static guardarTemporal(temp) {
-        if (!ControlFuncion.instance.temporales.includes(temp)) {
+        if (!ControlFuncion.getInstance().temporales.includes(temp)) {
             tama_o_1.Tamaño.aumentar();
-            ControlFuncion.instance.temporales.push(temp);
+            ControlFuncion.getInstance().temporales.push(temp);
         }
     }
     static removerTemporal(temp) {
-        const index = ControlFuncion.instance.temporales.indexOf(temp);
+        const index = ControlFuncion.getInstance().temporales.indexOf(temp);
         if (index >= 0) {
             tama_o_1.Tamaño.reducir();
-            ControlFuncion.instance.temporales.splice(index, 1);
+            ControlFuncion.getInstance().temporales.splice(index, 1);
         }
     }
 }

@@ -33,6 +33,7 @@ class Traduccion {
         this.reservarGlobalesEnHeap();
         codigo3D_1.Codigo3D.addInit('void main()\n{');
         //Codigo3D.addInit((new FuncionesPropias()).getCodigo());
+        codigo3D_1.Codigo3D.add('return;');
         codigo3D_1.Codigo3D.add('}');
         this.generarEncabezado();
         return codigo3D_1.Codigo3D.getCodigo();
@@ -227,7 +228,8 @@ class Traduccion {
         }
         // BOOLEAN
         else if (this.soyNodo('BOOLEAN', nodo)) {
-            return new primitivo_1.Primitivo(nodo.linea, nodo.hijos[0], 2 /* BOOLEAN */);
+            const valor = nodo.hijos[0] == 'true' ? '1' : '0';
+            return new primitivo_1.Primitivo(nodo.linea, valor, 2 /* BOOLEAN */);
         }
         //NULL
         else if (this.soyNodo('NULL', nodo)) {

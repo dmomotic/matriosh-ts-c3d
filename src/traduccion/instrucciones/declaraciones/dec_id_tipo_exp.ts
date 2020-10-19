@@ -5,9 +5,10 @@ import { Codigo3D } from "../../generales/codigo3D";
 import { NodoAST } from "../../generales/nodoAST";
 import { TablaSimbolos } from "../../generales/tablaSimbolos";
 import { Temporal } from "../../generales/temporal";
-import { getTypeOfNumber, tiposValidos, TIPO_DATO } from "../../generales/tipos";
+import { getNombreDeTipo, getTypeOfNumber, tiposValidos, TIPO_DATO } from "../../generales/tipos";
 import { Variable } from "../../generales/variable";
 import { Control } from "../../utils/control";
+import { ControlFuncion } from "../../utils/control_funcion";
 
 export class DecIdTipoExp extends NodoAST{
 
@@ -47,11 +48,14 @@ export class DecIdTipoExp extends NodoAST{
       return;
     }
 
+    //REMUEVO TEMPORAL GUARDADO
+    ControlFuncion.removerTemporal(control_exp.temporal);
+
     //Si es una declaracion global
     if(ts.esGlobal()){
-      //Si el number
-      if(this.tipo == TIPO_DATO.NUMBER){
-        Codigo3D.addComentario(`Declaracion y asignación de id: ${this.id} tipo number`);
+      //Si el number o boolean
+      if(this.tipo == TIPO_DATO.NUMBER || this.tipo == TIPO_DATO.BOOLEAN){
+        Codigo3D.addComentario(`Declaracion y asignación de id: ${this.id} tipo ${getNombreDeTipo(control_exp.tipo)}`);
         const pos = Heap.getSiguiente();
         const temp_pos = Temporal.getSiguiente();
 

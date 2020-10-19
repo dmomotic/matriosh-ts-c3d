@@ -35,7 +35,15 @@ export class Variable {
     return this.tipo == TIPO_DATO.NUMBER || this.tipo == TIPO_DATO.STRING || this.tipo == TIPO_DATO.BOOLEAN || this.tipo == TIPO_DATO.INT || this.tipo == TIPO_DATO.FLOAT;
   }
 
+  isString() : boolean{
+    return this.tipo === TIPO_DATO.STRING;
+  }
+
   isNumeric(): boolean{
     return this.tipo === TIPO_DATO.INT || this.tipo === TIPO_DATO.FLOAT;
+  }
+
+  isBoolean(): boolean{
+    return this.tipo === TIPO_DATO.BOOLEAN;
   }
 }

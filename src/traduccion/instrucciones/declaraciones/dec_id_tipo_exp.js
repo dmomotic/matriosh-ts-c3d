@@ -9,6 +9,7 @@ const nodoAST_1 = require("../../generales/nodoAST");
 const temporal_1 = require("../../generales/temporal");
 const tipos_1 = require("../../generales/tipos");
 const variable_1 = require("../../generales/variable");
+const control_funcion_1 = require("../../utils/control_funcion");
 class DecIdTipoExp extends nodoAST_1.NodoAST {
     constructor(linea, reasignable, id, tipo, exp, type_generador = null) {
         super(linea);
@@ -34,11 +35,13 @@ class DecIdTipoExp extends nodoAST_1.NodoAST {
             errores_1.Errores.push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `El tipo declarado y el tipo asignado del id: ${this.id} no son iguales` }));
             return;
         }
+        //REMUEVO TEMPORAL GUARDADO
+        control_funcion_1.ControlFuncion.removerTemporal(control_exp.temporal);
         //Si es una declaracion global
         if (ts.esGlobal()) {
-            //Si el number
-            if (this.tipo == 1 /* NUMBER */) {
-                codigo3D_1.Codigo3D.addComentario(`Declaracion y asignación de id: ${this.id} tipo number`);
+            //Si el number o boolean
+            if (this.tipo == 1 /* NUMBER */ || this.tipo == 2 /* BOOLEAN */) {
+                codigo3D_1.Codigo3D.addComentario(`Declaracion y asignación de id: ${this.id} tipo ${tipos_1.getNombreDeTipo(control_exp.tipo)}`);
                 const pos = heap_1.Heap.getSiguiente();
                 const temp_pos = temporal_1.Temporal.getSiguiente();
                 codigo3D_1.Codigo3D.add(`${temp_pos} = ${pos};`);

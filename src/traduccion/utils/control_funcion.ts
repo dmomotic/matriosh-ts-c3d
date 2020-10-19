@@ -29,17 +29,18 @@ export class ControlFuncion {
   }
 
   public static guardarTemporal(temp: string): void{
-    if(!ControlFuncion.instance.temporales.includes(temp)){
+    if(!ControlFuncion.getInstance().temporales.includes(temp)){
       Tamaño.aumentar();
-      ControlFuncion.instance.temporales.push(temp);
+      ControlFuncion.getInstance().temporales.push(temp);
     }
   }
 
   public static removerTemporal(temp: string): void{
-    const index = ControlFuncion.instance.temporales.indexOf(temp);
+    const index = ControlFuncion.getInstance().temporales.indexOf(temp);
+
     if(index >= 0){
       Tamaño.reducir();
-      ControlFuncion.instance.temporales.splice(index, 1);
+      ControlFuncion.getInstance().temporales.splice(index, 1);
     }
   }
 }

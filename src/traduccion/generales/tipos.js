@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.tiposValidos = exports.getTypeOfNumber = void 0;
+exports.getNombreDeTipo = exports.tiposValidos = exports.getTypeOfNumber = void 0;
 function getTypeOfNumber(valor) {
     if (valor.includes('.'))
         return 7 /* FLOAT */;
@@ -21,3 +21,26 @@ function tiposValidos(t1, t2) {
     return false;
 }
 exports.tiposValidos = tiposValidos;
+function getNombreDeTipo(tipo) {
+    switch (tipo) {
+        case 0 /* STRING */:
+            return 'String';
+        case 1 /* NUMBER */:
+            return 'Number';
+        case 2 /* BOOLEAN */:
+            return 'Boolean';
+        case 3 /* TYPE */:
+            return 'Type';
+        case 4 /* ARRAY */:
+            return 'Array';
+        case 5 /* VOID */:
+            return 'Void';
+        case 6 /* INT */:
+            return 'Int';
+        case 7 /* FLOAT */:
+            return 'Float';
+        case 8 /* NULL */:
+            return 'Null';
+    }
+}
+exports.getNombreDeTipo = getNombreDeTipo;
