@@ -13,6 +13,8 @@ const heap_1 = require("./estructuras/heap");
 const stack_1 = require("./estructuras/stack");
 const id_1 = require("./expresiones/id");
 const console_log_1 = require("./instrucciones/console_log");
+const If_1 = require("./estructuras/If");
+const instruccion_if_1 = require("./instrucciones/condicionales/instruccion_if");
 class Traduccion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
@@ -254,6 +256,23 @@ class Traduccion {
                 }
             });
             return exps;
+        }
+        //INSTRUCCION_IF  ---->  InstruccionIf(nodo.linea, [If])
+        else if (this.soyNodo('INSTRUCCION_IF', nodo)) {
+            switch (nodo.hijos.length) {
+                //IF
+                case 1: {
+                    const inst_if = this.recorrer(nodo.hijos[0]);
+                    return new instruccion_if_1.InstruccionIf(nodo.linea, [inst_if]);
+                }
+            }
+        }
+        //IF  ---->  If(condicion, instrucciones)
+        else if (this.soyNodo('IF', nodo)) {
+            //if par_izq EXP par_der llave_izq INSTRUCCIONES llave_der
+            const condicion = this.recorrer(nodo.hijos[2]);
+            const instrucciones = this.recorrer(nodo.hijos[5]);
+            return new If_1.If(condicion, instrucciones);
         }
     }
     /**

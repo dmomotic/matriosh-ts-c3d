@@ -4,6 +4,7 @@ exports.DecIdTipoExp = void 0;
 const error_1 = require("../../../arbol/error");
 const errores_1 = require("../../../arbol/errores");
 const heap_1 = require("../../estructuras/heap");
+const stack_1 = require("../../estructuras/stack");
 const codigo3D_1 = require("../../generales/codigo3D");
 const nodoAST_1 = require("../../generales/nodoAST");
 const temporal_1 = require("../../generales/temporal");
@@ -39,7 +40,7 @@ class DecIdTipoExp extends nodoAST_1.NodoAST {
         control_funcion_1.ControlFuncion.removerTemporal(control_exp.temporal);
         //Si es una declaracion global
         if (ts.esGlobal()) {
-            //Si el number o boolean
+            //Si es number o boolean
             if (this.tipo == 1 /* NUMBER */ || this.tipo == 2 /* BOOLEAN */) {
                 codigo3D_1.Codigo3D.addComentario(`Declaracion y asignación de id: ${this.id} tipo ${tipos_1.getNombreDeTipo(control_exp.tipo)}`);
                 const pos = heap_1.Heap.getSiguiente();
@@ -63,6 +64,16 @@ class DecIdTipoExp extends nodoAST_1.NodoAST {
         }
         //Si no es una declaracion global
         else {
+            //Si es number o bolean
+            if (this.tipo === 1 /* NUMBER */ || this.tipo === 2 /* BOOLEAN */) {
+                codigo3D_1.Codigo3D.addComentario(`Declaracion y asignación de id: ${this.id} tipo ${tipos_1.getNombreDeTipo(control_exp.tipo)}`);
+                const pos = stack_1.Stack.getSiguiente();
+                const temp_pos = temporal_1.Temporal.getSiguiente();
+                codigo3D_1.Codigo3D.add(`${temp_pos} = P + ${pos};`);
+                codigo3D_1.Codigo3D.add(`Stack[(int)${temp_pos}] = ${control_exp.temporal};`);
+                variable = new variable_1.Variable({ id: this.id, tipo: control_exp.tipo, reasignable: this.reasignable, posicion: pos, inicializado: true, global: false });
+                ts.setVariable(variable);
+            }
         }
     }
 }

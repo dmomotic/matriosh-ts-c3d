@@ -1,6 +1,7 @@
 import { Error } from "../../../arbol/error";
 import { Errores } from "../../../arbol/errores";
 import { Heap } from "../../estructuras/heap";
+import { Stack } from "../../estructuras/stack";
 import { Codigo3D } from "../../generales/codigo3D";
 import { NodoAST } from "../../generales/nodoAST";
 import { TablaSimbolos } from "../../generales/tablaSimbolos";
@@ -53,7 +54,7 @@ export class DecIdTipoExp extends NodoAST{
 
     //Si es una declaracion global
     if(ts.esGlobal()){
-      //Si el number o boolean
+      //Si es number o boolean
       if(this.tipo == TIPO_DATO.NUMBER || this.tipo == TIPO_DATO.BOOLEAN){
         Codigo3D.addComentario(`Declaracion y asignación de id: ${this.id} tipo ${getNombreDeTipo(control_exp.tipo)}`);
         const pos = Heap.getSiguiente();
@@ -82,7 +83,19 @@ export class DecIdTipoExp extends NodoAST{
     }
     //Si no es una declaracion global
     else {
+      //Si es number o bolean
+      if(this.tipo === TIPO_DATO.NUMBER || this.tipo === TIPO_DATO.BOOLEAN){
 
+        Codigo3D.addComentario(`Declaracion y asignación de id: ${this.id} tipo ${getNombreDeTipo(control_exp.tipo)}`);
+        const pos = Stack.getSiguiente();
+        const temp_pos = Temporal.getSiguiente();
+
+        Codigo3D.add(`${temp_pos} = P + ${pos};`);
+        Codigo3D.add(`Stack[(int)${temp_pos}] = ${control_exp.temporal};`);
+
+        variable = new Variable({id: this.id, tipo: control_exp.tipo, reasignable: this.reasignable, posicion: pos, inicializado: true, global: false});
+        ts.setVariable(variable);
+      }
     }
   }
 

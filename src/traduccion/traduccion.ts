@@ -12,6 +12,8 @@ import { Stack } from './estructuras/stack';
 import { FuncionesPropias } from './utils/funciones_propias';
 import { Id } from './expresiones/id';
 import { ConsoleLog } from './instrucciones/console_log';
+import { If } from './estructuras/If';
+import { InstruccionIf } from './instrucciones/condicionales/instruccion_if';
 
 export class Traduccion {
   raiz: Object;
@@ -278,6 +280,25 @@ export class Traduccion {
         }
       });
       return exps;
+    }
+
+    //INSTRUCCION_IF  ---->  InstruccionIf(nodo.linea, [If])
+    else if(this.soyNodo('INSTRUCCION_IF', nodo)){
+      switch(nodo.hijos.length){
+        //IF
+        case 1: {
+          const inst_if : If = this.recorrer(nodo.hijos[0]);
+          return new InstruccionIf(nodo.linea, [inst_if]);
+        }
+      }
+    }
+
+    //IF  ---->  If(condicion, instrucciones)
+    else if(this.soyNodo('IF', nodo)){
+      //if par_izq EXP par_der llave_izq INSTRUCCIONES llave_der
+      const condicion : NodoAST = this.recorrer(nodo.hijos[2]);
+      const instrucciones : NodoAST[] = this.recorrer(nodo.hijos[5]);
+      return new If(condicion, instrucciones);
     }
   }
 

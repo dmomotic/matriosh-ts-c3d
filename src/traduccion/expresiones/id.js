@@ -38,6 +38,19 @@ class Id extends nodoAST_1.NodoAST {
         }
         //TODO: Si no es una variable global
         else {
+            //Si es de tipo numerico
+            if (variable.isNumeric()) {
+                codigo3D_1.Codigo3D.addComentario(`Acceso a la variable con id: ${variable.id} (${tipos_1.getNombreDeTipo(variable.tipo)})`);
+                const temp_ref = temporal_1.Temporal.getSiguiente();
+                codigo3D_1.Codigo3D.add(`${temp_ref} = ${variable.posicion};`);
+                const temp_pos = temporal_1.Temporal.getSiguiente();
+                codigo3D_1.Codigo3D.add(`${temp_pos} = P + ${temp_ref};`);
+                const temp_real = temporal_1.Temporal.getSiguiente();
+                codigo3D_1.Codigo3D.add(`${temp_real} = Stack[(int)${temp_pos}];`);
+                //GUARDO EL TEMPORAL
+                control_funcion_1.ControlFuncion.guardarTemporal(temp_real);
+                return new control_1.Control({ temporal: temp_real, tipo: variable.tipo });
+            }
         }
     }
 }

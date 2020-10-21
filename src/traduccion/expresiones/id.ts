@@ -43,7 +43,19 @@ export class Id extends NodoAST{
     }
     //TODO: Si no es una variable global
     else{
-
+      //Si es de tipo numerico
+      if(variable.isNumeric()){
+        Codigo3D.addComentario(`Acceso a la variable con id: ${variable.id} (${getNombreDeTipo(variable.tipo)})`);
+        const temp_ref = Temporal.getSiguiente();
+        Codigo3D.add(`${temp_ref} = ${variable.posicion};`);
+        const temp_pos = Temporal.getSiguiente();
+        Codigo3D.add(`${temp_pos} = P + ${temp_ref};`);
+        const temp_real = Temporal.getSiguiente();
+        Codigo3D.add(`${temp_real} = Stack[(int)${temp_pos}];`)
+        //GUARDO EL TEMPORAL
+        ControlFuncion.guardarTemporal(temp_real);
+        return new Control({temporal: temp_real, tipo: variable.tipo});
+      }
     }
   }
 
