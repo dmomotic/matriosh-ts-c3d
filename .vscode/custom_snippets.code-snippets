@@ -20,4 +20,14 @@
     "body": ["Errores.push(new Error({tipo: '$1', linea: this.linea, descripcion: `$0`}));"],
     "description": "Agregar error nuevo"
   },
+  "C3D Add Line": {
+    "prefix": "ad",
+    "body": ["Codigo3D.add(`$0`);"],
+    "description": "Agregar linea al codigo 3D"
+  },
+  "C3D Comentario": {
+    "prefix": "ac",
+    "body": ["Codigo3D.addComentario(`$0`);"],
+    "description": "Agregar comentario al codigo 3D"
+  },
 }

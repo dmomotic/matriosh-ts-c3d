@@ -14,6 +14,17 @@ import { Id } from './expresiones/id';
 import { ConsoleLog } from './instrucciones/console_log';
 import { If } from './estructuras/If';
 import { InstruccionIf } from './instrucciones/condicionales/instruccion_if';
+import { Suma } from './expresiones/aritmeticas/suma';
+import { Resta } from './expresiones/aritmeticas/resta';
+import { Errores } from '../arbol/errores';
+import { Multiplicacion } from './expresiones/aritmeticas/multiplicacion';
+import { Division } from './expresiones/aritmeticas/division';
+import { Modular } from './expresiones/aritmeticas/modular';
+import { MayorQue } from './expresiones/relacionales/mayor_que';
+import { MayorIgualQue } from './expresiones/relacionales/mayor_igual_que';
+import { MenorQue } from './expresiones/relacionales/menor_que';
+import { MenorIgualQue } from './expresiones/relacionales/menor_igual_que';
+import { Potencia } from './expresiones/aritmeticas/potencia';
 
 export class Traduccion {
   raiz: Object;
@@ -25,6 +36,7 @@ export class Traduccion {
   }
 
   traducir(): string {
+    Errores.clear();
     Stack.clear();
     Heap.clear();
     Temporal.clear();
@@ -48,16 +60,17 @@ export class Traduccion {
   }
 
   generarEncabezado(): void {
-    let encabezado = '#include <stdio.h>\n\n';
-    encabezado += 'float Heap[16384];\n';
-    encabezado += 'float Stack[16384];\n';
-    encabezado += 'float P;\n';
-    encabezado += 'float H;\n';
+    let encabezado = '#include <stdio.h>\n';
+    encabezado += '#include <math.h>\n\n';
+    encabezado += 'double Heap[16384];\n';
+    encabezado += 'double Stack[16384];\n';
+    encabezado += 'double P;\n';
+    encabezado += 'double H;\n';
     const ultimo: number = Temporal.getIndex();
     let temporales = '\n';
     for(let i: number = 0; i < ultimo; i++){
       if(i == 0){
-        temporales += 'float ';
+        temporales += 'double ';
       }
       temporales += 't'+i;
       //Si es el ultimo
@@ -232,6 +245,67 @@ export class Traduccion {
             //Si es un objeto
             if (exp instanceof Object) return exp;
           }
+          case 3:
+            //EXP mas EXP
+            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '+' && this.soyNodo('EXP', nodo.hijos[2])){
+              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+              return new Suma(nodo.linea, op_izq, op_der);
+            }
+            //EXP menos EXP
+            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '-' && this.soyNodo('EXP', nodo.hijos[2])){
+              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+              return new Resta(nodo.linea, op_izq, op_der);
+            }
+            //EXP por EXP
+            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '*' && this.soyNodo('EXP', nodo.hijos[2])){
+              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+              return new Multiplicacion(nodo.linea, op_izq, op_der);
+            }
+            //EXP div EXP
+            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '/' && this.soyNodo('EXP', nodo.hijos[2])){
+              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+              return new Division(nodo.linea, op_izq, op_der);
+            }
+            //EXP mod EXP
+            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '%' && this.soyNodo('EXP', nodo.hijos[2])){
+              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+              return new Modular(nodo.linea, op_izq, op_der);
+            }
+            //EXP potencia EXP
+            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '**' && this.soyNodo('EXP', nodo.hijos[2])){
+              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+              return new Potencia(nodo.linea, op_izq, op_der);
+            }
+            //EXP mayor EXP
+            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '>' && this.soyNodo('EXP', nodo.hijos[2])){
+              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+              return new MayorQue(nodo.linea, op_izq, op_der);
+            }
+            //EXP mayor_igual EXP
+            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '>=' && this.soyNodo('EXP', nodo.hijos[2])){
+              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+              return new MayorIgualQue(nodo.linea, op_izq, op_der);
+            }
+            //EXP menor EXP
+            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '<' && this.soyNodo('EXP', nodo.hijos[2])){
+              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+              return new MenorQue(nodo.linea, op_izq, op_der);
+            }
+            //EXP menor_igual EXP
+            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '<=' && this.soyNodo('EXP', nodo.hijos[2])){
+              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+              return new MenorIgualQue(nodo.linea, op_izq, op_der);
+            }
       }
     }
 
@@ -290,6 +364,13 @@ export class Traduccion {
           const inst_if : If = this.recorrer(nodo.hijos[0]);
           return new InstruccionIf(nodo.linea, [inst_if]);
         }
+        case 2:
+          //IF ELSE
+          if(this.soyNodo('IF',nodo.hijos[0]) && this.soyNodo('ELSE', nodo.hijos[1])){
+            const inst_if : If = this.recorrer(nodo.hijos[0]);
+            const inst_else : If = this.recorrer(nodo.hijos[1]);
+            return new InstruccionIf(nodo.linea, [inst_if, inst_else]);
+          }
       }
     }
 
@@ -299,6 +380,13 @@ export class Traduccion {
       const condicion : NodoAST = this.recorrer(nodo.hijos[2]);
       const instrucciones : NodoAST[] = this.recorrer(nodo.hijos[5]);
       return new If(condicion, instrucciones);
+    }
+
+    //ELSE  ---->  If(null, instrucciones)
+    else if(this.soyNodo('ELSE', nodo)){
+      //else llave_izq INSTRUCCIONES llave_der
+      const instrucciones : NodoAST[] = this.recorrer(nodo.hijos[2]);
+      return new If(null, instrucciones);
     }
   }
 

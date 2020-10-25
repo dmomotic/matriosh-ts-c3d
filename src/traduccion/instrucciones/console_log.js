@@ -91,6 +91,8 @@ class ConsoleLog extends nodoAST_1.NodoAST {
                         codigo3D_1.Codigo3D.add(`${lbl_fin}:`);
                     }
                 }
+                codigo3D_1.Codigo3D.add(`printf("\\n");`);
+                codigo3D_1.Codigo3D.addComentario('FIN CONSOLE.LOG()');
             }
         }
     }

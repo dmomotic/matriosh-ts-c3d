@@ -40,38 +40,32 @@ class DecIdTipoExp extends nodoAST_1.NodoAST {
         control_funcion_1.ControlFuncion.removerTemporal(control_exp.temporal);
         //Si es una declaracion global
         if (ts.esGlobal()) {
-            //Si es number o boolean
-            if (this.tipo == 1 /* NUMBER */ || this.tipo == 2 /* BOOLEAN */) {
-                codigo3D_1.Codigo3D.addComentario(`Declaracion y asignación de id: ${this.id} tipo ${tipos_1.getNombreDeTipo(control_exp.tipo)}`);
+            //Si es number o boolean o string
+            if (this.tipo == 1 /* NUMBER */ || this.tipo == 2 /* BOOLEAN */ || this.tipo == 0 /* STRING */) {
+                //Validacion para strings
+                const tipo = this.tipo == 0 /* STRING */ ? 0 /* STRING */ : control_exp.tipo;
+                codigo3D_1.Codigo3D.addComentario(`Declaracion y asignación de id: ${this.id} tipo ${tipos_1.getNombreDeTipo(tipo)}`);
                 const pos = heap_1.Heap.getSiguiente();
                 const temp_pos = temporal_1.Temporal.getSiguiente();
                 codigo3D_1.Codigo3D.add(`${temp_pos} = ${pos};`);
                 codigo3D_1.Codigo3D.add(`Heap[ (int)${temp_pos} ] = ${control_exp.temporal};`);
                 //Registro la variable en la tabla de simbolos
-                variable = new variable_1.Variable({ id: this.id, reasignable: this.reasignable, tipo: control_exp.tipo, global: true, inicializado: true, posicion: pos });
-                ts.setVariable(variable);
-            }
-            //Si es string
-            else if (this.tipo == 0 /* STRING */) {
-                codigo3D_1.Codigo3D.addComentario(`Declaracion y asignación de id: ${this.id} tipo string`);
-                const pos = heap_1.Heap.getSiguiente();
-                const temp_pos = temporal_1.Temporal.getSiguiente();
-                codigo3D_1.Codigo3D.add(`${temp_pos} = ${pos};`);
-                codigo3D_1.Codigo3D.add(`Heap[ (int)${temp_pos} ] = ${control_exp.temporal};`);
-                variable = new variable_1.Variable({ id: this.id, reasignable: this.reasignable, tipo: this.tipo, global: true, inicializado: true, posicion: pos });
+                variable = new variable_1.Variable({ id: this.id, reasignable: this.reasignable, tipo, global: true, inicializado: true, posicion: pos });
                 ts.setVariable(variable);
             }
         }
         //Si no es una declaracion global
         else {
-            //Si es number o bolean
-            if (this.tipo === 1 /* NUMBER */ || this.tipo === 2 /* BOOLEAN */) {
-                codigo3D_1.Codigo3D.addComentario(`Declaracion y asignación de id: ${this.id} tipo ${tipos_1.getNombreDeTipo(control_exp.tipo)}`);
+            //Si es number o bolean o string
+            if (this.tipo === 1 /* NUMBER */ || this.tipo === 2 /* BOOLEAN */ || this.tipo == 0 /* STRING */) {
+                //Validacion para strings
+                const tipo = this.tipo == 0 /* STRING */ ? 0 /* STRING */ : control_exp.tipo;
+                codigo3D_1.Codigo3D.addComentario(`Declaracion y asignación de id: ${this.id} tipo ${tipos_1.getNombreDeTipo(tipo)}`);
                 const pos = stack_1.Stack.getSiguiente();
                 const temp_pos = temporal_1.Temporal.getSiguiente();
                 codigo3D_1.Codigo3D.add(`${temp_pos} = P + ${pos};`);
                 codigo3D_1.Codigo3D.add(`Stack[(int)${temp_pos}] = ${control_exp.temporal};`);
-                variable = new variable_1.Variable({ id: this.id, tipo: control_exp.tipo, reasignable: this.reasignable, posicion: pos, inicializado: true, global: false });
+                variable = new variable_1.Variable({ id: this.id, tipo, reasignable: this.reasignable, posicion: pos, inicializado: true, global: false });
                 ts.setVariable(variable);
             }
         }

@@ -26,9 +26,8 @@ class Id extends nodoAST_1.NodoAST {
             //Si es de tipo numerico o string o boolean
             if (variable.isNumeric() || variable.isString() || variable.isBoolean()) {
                 codigo3D_1.Codigo3D.addComentario(`Acceso a la variable global con id: ${variable.id} (${tipos_1.getNombreDeTipo(variable.tipo)})`);
-                const pos = variable.posicion;
                 const temp_pos = temporal_1.Temporal.getSiguiente();
-                codigo3D_1.Codigo3D.add(`${temp_pos} = ${pos};`);
+                codigo3D_1.Codigo3D.add(`${temp_pos} = ${variable.posicion};`);
                 const temp = temporal_1.Temporal.getSiguiente();
                 codigo3D_1.Codigo3D.add(`${temp} = Heap[(int)${temp_pos}];`);
                 //GUARDO EL TEMPORAL
@@ -39,7 +38,7 @@ class Id extends nodoAST_1.NodoAST {
         //TODO: Si no es una variable global
         else {
             //Si es de tipo numerico
-            if (variable.isNumeric()) {
+            if (variable.isNumeric() || variable.isString() || variable.isBoolean()) {
                 codigo3D_1.Codigo3D.addComentario(`Acceso a la variable con id: ${variable.id} (${tipos_1.getNombreDeTipo(variable.tipo)})`);
                 const temp_ref = temporal_1.Temporal.getSiguiente();
                 codigo3D_1.Codigo3D.add(`${temp_ref} = ${variable.posicion};`);

@@ -45,7 +45,7 @@ export class InstruccionIf extends NodoAST {
         }
         //Si el control recibido tiene etiquetas
         if (control_if.hasEtiquetas()) {
-          //Imprimo al inicio cada etiqueta verdade
+          //Imprimo al inicio cada etiqueta verdadera
           for (let lbl of control_if.verdaderas) {
             Codigo3D.add(`${lbl}:`);
           }

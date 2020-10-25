@@ -98,6 +98,8 @@ export class ConsoleLog extends NodoAST {
             Codigo3D.add(`${lbl_fin}:`);
           }
         }
+        Codigo3D.add(`printf("\\n");`);
+        Codigo3D.addComentario('FIN CONSOLE.LOG()');
       }
     }
   }

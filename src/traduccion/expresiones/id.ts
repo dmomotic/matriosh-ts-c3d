@@ -31,9 +31,8 @@ export class Id extends NodoAST{
       //Si es de tipo numerico o string o boolean
       if(variable.isNumeric()  || variable.isString() || variable.isBoolean()){
         Codigo3D.addComentario(`Acceso a la variable global con id: ${variable.id} (${getNombreDeTipo(variable.tipo)})`);
-        const pos = variable.posicion;
         const temp_pos = Temporal.getSiguiente();
-        Codigo3D.add(`${temp_pos} = ${pos};`);
+        Codigo3D.add(`${temp_pos} = ${variable.posicion};`);
         const temp = Temporal.getSiguiente();
         Codigo3D.add(`${temp} = Heap[(int)${temp_pos}];`);
         //GUARDO EL TEMPORAL
@@ -44,7 +43,7 @@ export class Id extends NodoAST{
     //TODO: Si no es una variable global
     else{
       //Si es de tipo numerico
-      if(variable.isNumeric()){
+      if(variable.isNumeric() || variable.isString() || variable.isBoolean()){
         Codigo3D.addComentario(`Acceso a la variable con id: ${variable.id} (${getNombreDeTipo(variable.tipo)})`);
         const temp_ref = Temporal.getSiguiente();
         Codigo3D.add(`${temp_ref} = ${variable.posicion};`);

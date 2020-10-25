@@ -384,15 +384,15 @@ EXP
   | EXP por EXP { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
   | EXP div EXP { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
   | EXP mod EXP { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
-  | EXP potencia EXP { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
+  | EXP potencia EXP /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
   | id mas_mas { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2], linea: yylineno}); }
   | id menos_menos { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2], linea: yylineno}); }
   | par_izq EXP par_der { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
   //Operaciones de Comparacion
-  | EXP mayor EXP { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
-  | EXP menor EXP { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
-  | EXP mayor_igual EXP { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
-  | EXP menor_igual EXP { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
+  | EXP mayor EXP /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
+  | EXP menor EXP /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
+  | EXP mayor_igual EXP /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
+  | EXP menor_igual EXP /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
   | EXP igual_que EXP { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
   | EXP dif_que EXP { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
   //Operaciones Lógicas

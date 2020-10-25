@@ -89,6 +89,8 @@ import "codemirror/mode/clike/clike.js";
 import analizador from "../analizador/gramatica";
 //Traduccion
 import { Traduccion } from "../traduccion/traduccion";
+//Errores
+import { Errores } from '../arbol/errores';
 
 export default {
   components: {
@@ -135,8 +137,13 @@ export default {
     };
   },
   computed: {
+    /** @returns {boolean} */
     showCopyButton(){
       return this.traduccion != null && this.traduccion.trim().length > 0;
+    },
+    /** @returns {boolean} */
+    hasErrors(){
+      return this.errores != null && this.errores.length > 0;
     }
   },
   methods: {
@@ -181,10 +188,12 @@ export default {
       } catch (error) {
         this.notificar("negative", JSON.stringify(error));
       }
+      this.errores = Errores.getErrors();
     },
     limpiar(){
       this.code = '';
       this.traduccion = '';
+      Errores.clear();
     },
     codigoEditado(){},
     copiar(){
