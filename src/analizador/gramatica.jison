@@ -103,14 +103,15 @@
 %left 'interrogacion'
 %left 'or'
 %left 'and'
-%left 'not'
+//%left 'not'
 %left 'igual_que' 'dif_que'
 %left 'mayor' 'menor' 'mayor_igual' 'menor_igual'
 %left 'mas' 'menos'
 %left 'por' 'div' 'mod'
 %left 'umenos'
 %right 'potencia'
-%left 'mas_mas' 'menos_menos'
+%left 'mas_mas' 'menos_menos' 'not'
+//%left 'mas_mas' 'menos_menos'
 
 %start S
 
@@ -378,7 +379,7 @@ INCREMENTO_DECREMENTO
 
 EXP
   //Operaciones Aritmeticas
-  : menos EXP %prec umenos { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2], linea: yylineno}); }
+  : menos EXP %prec umenos /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2], linea: yylineno}); }
   | EXP mas EXP { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
   | EXP menos EXP { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
   | EXP por EXP { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
@@ -396,9 +397,9 @@ EXP
   | EXP igual_que EXP { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
   | EXP dif_que EXP { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
   //Operaciones Lógicas
-  | EXP and EXP { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
-  | EXP or EXP { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
-  | not EXP { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2], linea: yylineno}); }
+  | EXP and EXP /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
+  | EXP or EXP /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2, $3], linea: yylineno}); }
+  | not EXP /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [$1, $2], linea: yylineno}); }
   //Valores Primitivos
   | number /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [new NodoAST({label: 'NUMBER', hijos: [$1], linea: yylineno})], linea: yylineno}); }
   | string /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [new NodoAST({label: 'STRING', hijos: [$1], linea: yylineno})], linea: yylineno}); }

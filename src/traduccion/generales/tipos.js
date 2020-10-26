@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getNombreDeTipo = exports.tiposValidos = exports.getTypeOfNumber = void 0;
+exports.getNombreDeTipo = exports.isTipoVoid = exports.isTipoNull = exports.isTipoArray = exports.isTipoType = exports.isTipoString = exports.isTipoBoolean = exports.isTipoNumber = exports.tiposValidos = exports.getTypeOfNumber = void 0;
 function getTypeOfNumber(valor) {
     if (valor.includes('.'))
         return 7 /* FLOAT */;
@@ -21,6 +21,34 @@ function tiposValidos(t1, t2) {
     return false;
 }
 exports.tiposValidos = tiposValidos;
+function isTipoNumber(tipo) {
+    return tipo == 1 /* NUMBER */ || tipo == 6 /* INT */ || tipo == 7 /* FLOAT */;
+}
+exports.isTipoNumber = isTipoNumber;
+function isTipoBoolean(tipo) {
+    return tipo == 2 /* BOOLEAN */;
+}
+exports.isTipoBoolean = isTipoBoolean;
+function isTipoString(tipo) {
+    return tipo == 0 /* STRING */;
+}
+exports.isTipoString = isTipoString;
+function isTipoType(tipo) {
+    return tipo == 3 /* TYPE */;
+}
+exports.isTipoType = isTipoType;
+function isTipoArray(tipo) {
+    return tipo == 4 /* ARRAY */;
+}
+exports.isTipoArray = isTipoArray;
+function isTipoNull(tipo) {
+    return tipo == 8 /* NULL */;
+}
+exports.isTipoNull = isTipoNull;
+function isTipoVoid(tipo) {
+    return tipo == 5 /* VOID */;
+}
+exports.isTipoVoid = isTipoVoid;
 function getNombreDeTipo(tipo) {
     switch (tipo) {
         case 0 /* STRING */:

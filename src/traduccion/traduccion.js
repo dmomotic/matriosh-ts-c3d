@@ -26,6 +26,11 @@ const mayor_igual_que_1 = require("./expresiones/relacionales/mayor_igual_que");
 const menor_que_1 = require("./expresiones/relacionales/menor_que");
 const menor_igual_que_1 = require("./expresiones/relacionales/menor_igual_que");
 const potencia_1 = require("./expresiones/aritmeticas/potencia");
+const and_1 = require("./expresiones/logica/and");
+const or_1 = require("./expresiones/logica/or");
+const not_1 = require("./expresiones/logica/not");
+const umenos_1 = require("./expresiones/aritmeticas/umenos");
+const igual_que_1 = require("./expresiones/relacionales/igual_que");
 class Traduccion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
@@ -227,7 +232,27 @@ class Traduccion {
                         if (exp instanceof Object)
                             return exp;
                     }
+                case 2:
+                    /*****************************
+                     * OPERACIONES ARITMENTICAS
+                     *****************************/
+                    //menos EXP
+                    if (nodo.hijos[0] == '-' && this.soyNodo('EXP', nodo.hijos[1])) {
+                        const exp = this.recorrer(nodo.hijos[1]);
+                        return new umenos_1.UMenos(nodo.linea, exp);
+                    }
+                    /*****************************
+                     * OPERACIONES LOGICAS
+                     *****************************/
+                    //not EXP
+                    if (nodo.hijos[0] == '!' && this.soyNodo('EXP', nodo.hijos[1])) {
+                        const exp = this.recorrer(nodo.hijos[1]);
+                        return new not_1.Not(nodo.linea, exp);
+                    }
                 case 3:
+                    /*****************************
+                     * OPERACIONES ARITMENTICAS
+                     *****************************/
                     //EXP mas EXP
                     if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '+' && this.soyNodo('EXP', nodo.hijos[2])) {
                         const op_izq = this.recorrer(nodo.hijos[0]);
@@ -264,6 +289,9 @@ class Traduccion {
                         const op_der = this.recorrer(nodo.hijos[2]);
                         return new potencia_1.Potencia(nodo.linea, op_izq, op_der);
                     }
+                    /*****************************
+                     * OPERACIONES RELACIONALES
+                     *****************************/
                     //EXP mayor EXP
                     if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '>' && this.soyNodo('EXP', nodo.hijos[2])) {
                         const op_izq = this.recorrer(nodo.hijos[0]);
@@ -287,6 +315,27 @@ class Traduccion {
                         const op_izq = this.recorrer(nodo.hijos[0]);
                         const op_der = this.recorrer(nodo.hijos[2]);
                         return new menor_igual_que_1.MenorIgualQue(nodo.linea, op_izq, op_der);
+                    }
+                    //EXP igual_que EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '==' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        const op_izq = this.recorrer(nodo.hijos[0]);
+                        const op_der = this.recorrer(nodo.hijos[2]);
+                        return new igual_que_1.IgualQue(nodo.linea, op_izq, op_der);
+                    }
+                    /*****************************
+                     * OPERACIONES LOGICAS
+                     *****************************/
+                    //EXP and EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '&&' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        const op_izq = this.recorrer(nodo.hijos[0]);
+                        const op_der = this.recorrer(nodo.hijos[2]);
+                        return new and_1.And(nodo.linea, op_izq, op_der);
+                    }
+                    //EXP or EXP
+                    if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '||' && this.soyNodo('EXP', nodo.hijos[2])) {
+                        const op_izq = this.recorrer(nodo.hijos[0]);
+                        const op_der = this.recorrer(nodo.hijos[2]);
+                        return new or_1.Or(nodo.linea, op_izq, op_der);
                     }
             }
         }

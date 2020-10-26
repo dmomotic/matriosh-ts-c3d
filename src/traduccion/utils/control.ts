@@ -4,10 +4,10 @@ export class Control{
   temporal: string;
   tipo: TIPO_DATO;
   referencia: string;
-  verdaderas: Array<String>;
-  falsas: Array<String>;
+  verdaderas: string[];
+  falsas: string[];
 
-  constructor({temporal = null, tipo = null, referencia = null, verdaderas = [], falsas = []}: {temporal?: string, tipo?: TIPO_DATO, referencia?: string, verdaderas?: Array<String>, falsas?: Array<String>}){
+  constructor({temporal = null, tipo = null, referencia = null, verdaderas = [], falsas = []}: {temporal?: string, tipo?: TIPO_DATO, referencia?: string, verdaderas?: string[], falsas?: string[]}){
     Object.assign(this, {temporal, tipo, referencia, verdaderas, falsas});
   }
 

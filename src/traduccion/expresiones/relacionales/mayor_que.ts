@@ -36,7 +36,6 @@ export class MayorQue extends NodoAST {
     //Comprobacion de tipo
     const tipo = this.getTipoResultante(control_izq.tipo, control_der.tipo);
     if (tipo === TIPO_DATO.NULL) {
-
       Errores.push(new Error({ tipo: 'semantico', linea: this.linea, descripcion: `No se puede realizar una operacion mayor que con los tipos ${getNombreDeTipo(control_izq.tipo)} y ${getNombreDeTipo(control_der.tipo)}` }));
       return;
     }

@@ -21,6 +21,34 @@ export function tiposValidos(t1: TIPO_DATO, t2: TIPO_DATO): boolean {
   return false;
 }
 
+export function isTipoNumber(tipo: TIPO_DATO): boolean{
+  return tipo == TIPO_DATO.NUMBER || tipo == TIPO_DATO.INT || tipo == TIPO_DATO.FLOAT;
+}
+
+export function isTipoBoolean(tipo: TIPO_DATO): boolean{
+  return tipo == TIPO_DATO.BOOLEAN;
+}
+
+export function isTipoString(tipo: TIPO_DATO): boolean{
+  return tipo == TIPO_DATO.STRING;
+}
+
+export function isTipoType(tipo: TIPO_DATO): boolean{
+  return tipo == TIPO_DATO.TYPE;
+}
+
+export function isTipoArray(tipo: TIPO_DATO): boolean{
+  return tipo == TIPO_DATO.ARRAY;
+}
+
+export function isTipoNull(tipo: TIPO_DATO): boolean{
+  return tipo == TIPO_DATO.NULL;
+}
+
+export function isTipoVoid(tipo: TIPO_DATO): boolean{
+  return tipo == TIPO_DATO.VOID;
+}
+
 export function getNombreDeTipo(tipo: TIPO_DATO): string {
   switch (tipo) {
     case TIPO_DATO.STRING:
