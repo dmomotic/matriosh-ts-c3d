@@ -19,5 +19,8 @@ class Tamaño {
     static clear() {
         Tamaño.getInstance().index = 1;
     }
+    static getValor() {
+        return Tamaño.getInstance().index;
+    }
 }
 exports.Tamaño = Tamaño;

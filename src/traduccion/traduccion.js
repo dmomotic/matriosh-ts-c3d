@@ -358,7 +358,7 @@ class Traduccion {
         }
         //NULL
         else if (this.soyNodo('NULL', nodo)) {
-            //return new Nativo(nodo.linea, null);
+            return new primitivo_1.Primitivo(nodo.linea, null, 8 /* NULL */);
         }
         //CONSOLE_LOG
         else if (this.soyNodo('CONSOLE_LOG', nodo)) {
@@ -395,6 +395,20 @@ class Traduccion {
                         const inst_else = this.recorrer(nodo.hijos[1]);
                         return new instruccion_if_1.InstruccionIf(nodo.linea, [inst_if, inst_else]);
                     }
+                    //IF LISTA_ELSE_IF
+                    if (this.soyNodo('IF', nodo.hijos[0]) && this.soyNodo('LISTA_ELSE_IF', nodo.hijos[1])) {
+                        const inst_if = this.recorrer(nodo.hijos[0]);
+                        const lista_ifs = this.recorrer(nodo.hijos[1]);
+                        return new instruccion_if_1.InstruccionIf(nodo.linea, [inst_if, ...lista_ifs]);
+                    }
+                case 3:
+                    //IF LISTA_ELSE_IF ELSE
+                    if (this.soyNodo('IF', nodo.hijos[0]) && this.soyNodo('LISTA_ELSE_IF', nodo.hijos[1]) && this.soyNodo('ELSE', nodo.hijos[2])) {
+                        const inst_if = this.recorrer(nodo.hijos[0]);
+                        const lista_ifs = this.recorrer(nodo.hijos[1]);
+                        const inst_else = this.recorrer(nodo.hijos[2]);
+                        return new instruccion_if_1.InstruccionIf(nodo.linea, [inst_if, ...lista_ifs, inst_else]);
+                    }
             }
         }
         //IF  ---->  If(condicion, instrucciones)
@@ -404,11 +418,41 @@ class Traduccion {
             const instrucciones = this.recorrer(nodo.hijos[5]);
             return new If_1.If(condicion, instrucciones);
         }
+        //ELSE_IF  ---->  If(condicion, instrucciones)
+        else if (this.soyNodo('ELSE_IF', nodo)) {
+            //else if par_izq EXP par_der llave_izq INSTRUCCIONES llave_der
+            const condicion = this.recorrer(nodo.hijos[3]);
+            const instrucciones = this.recorrer(nodo.hijos[6]);
+            return new If_1.If(condicion, instrucciones);
+        }
         //ELSE  ---->  If(null, instrucciones)
         else if (this.soyNodo('ELSE', nodo)) {
             //else llave_izq INSTRUCCIONES llave_der
             const instrucciones = this.recorrer(nodo.hijos[2]);
             return new If_1.If(null, instrucciones);
+        }
+        //LISTA_ELSE_IF  ---->  [ If(null, instrucciones) ]
+        else if (this.soyNodo('LISTA_ELSE_IF', nodo)) {
+            const lista_ifs = [];
+            nodo.hijos.forEach((nodoHijo) => {
+                const inst_if = this.recorrer(nodoHijo);
+                if (inst_if != null && inst_if instanceof If_1.If) {
+                    lista_ifs.push(inst_if);
+                }
+            });
+            return lista_ifs;
+        }
+        //DECLARACION_FUNCION
+        else if (this.soyNodo('DECLARACION_FUNCION', nodo)) {
+            const id = nodo.hijos[1];
+            switch (nodo.hijos) {
+                //function id par_izq par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der
+                case 9: {
+                    //{ tipo, type_generador? }
+                    const tipo_funcion = this.recorrer(nodo.hijos[5]);
+                    const instrucciones = this.recorrer(nodo.hijo[7]);
+                }
+            }
         }
     }
     /**

@@ -61,6 +61,10 @@ export class Primitivo extends NodoAST{
         Codigo3D.addComentario('Lectura de boolean');
         Codigo3D.add(`${temporal} = ${this.valor};`);
         return new Control({temporal, tipo: this.tipo});
+      case TIPO_DATO.NULL:
+        Codigo3D.addComentario(`Lectura de null`);
+        Codigo3D.add(`${temporal} = -1 ;`);
+        return new Control({temporal, tipo: this.tipo});
     }
   }
 }

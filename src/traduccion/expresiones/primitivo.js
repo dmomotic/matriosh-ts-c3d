@@ -54,6 +54,10 @@ class Primitivo extends nodoAST_1.NodoAST {
                 codigo3D_1.Codigo3D.addComentario('Lectura de boolean');
                 codigo3D_1.Codigo3D.add(`${temporal} = ${this.valor};`);
                 return new control_1.Control({ temporal, tipo: this.tipo });
+            case 8 /* NULL */:
+                codigo3D_1.Codigo3D.addComentario(`Lectura de null`);
+                codigo3D_1.Codigo3D.add(`${temporal} = -1 ;`);
+                return new control_1.Control({ temporal, tipo: this.tipo });
         }
     }
 }

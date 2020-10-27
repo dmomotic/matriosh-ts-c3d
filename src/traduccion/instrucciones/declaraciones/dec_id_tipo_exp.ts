@@ -10,6 +10,7 @@ import { getNombreDeTipo, getTypeOfNumber, tiposValidos, TIPO_DATO } from "../..
 import { Variable } from "../../generales/variable";
 import { Control } from "../../utils/control";
 import { ControlFuncion } from "../../utils/control_funcion";
+import { Tamaño } from "../../utils/tamaño";
 
 export class DecIdTipoExp extends NodoAST{
 
@@ -23,6 +24,10 @@ export class DecIdTipoExp extends NodoAST{
   constructor(linea: string, reasignable: boolean, id: string, tipo: TIPO_DATO, exp: NodoAST, type_generador: string = null){
     super(linea);
     Object.assign(this, {reasignable, id, tipo, exp, type_generador});
+  }
+
+  calcularTamaño() : void {
+    Tamaño.aumentar();
   }
 
   traducir(ts: TablaSimbolos) {

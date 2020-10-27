@@ -18,6 +18,16 @@ export class InstruccionIf extends NodoAST {
     Object.assign(this, { ifs });
   }
 
+  calcularTamaño() : void {
+    //Recorro cada if
+    for(const inst_if of this.ifs ){
+      //Recorro cada instruccion del if
+      for(const nodo of inst_if.instrucciones){
+        nodo.calcularTamaño();
+      }
+    }
+  }
+
   traducir(ts: TablaSimbolos) {
     Codigo3D.addComentario(`INICIO SENTENCIA IF`);
     const salidas: string[] = [];

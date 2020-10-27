@@ -11,10 +11,14 @@ const temporal_1 = require("../../generales/temporal");
 const tipos_1 = require("../../generales/tipos");
 const variable_1 = require("../../generales/variable");
 const control_funcion_1 = require("../../utils/control_funcion");
+const tama_o_1 = require("../../utils/tama\u00F1o");
 class DecIdTipoExp extends nodoAST_1.NodoAST {
     constructor(linea, reasignable, id, tipo, exp, type_generador = null) {
         super(linea);
         Object.assign(this, { reasignable, id, tipo, exp, type_generador });
+    }
+    calcularTamaño() {
+        tama_o_1.Tamaño.aumentar();
     }
     traducir(ts) {
         //Busco en tabla de simbolos

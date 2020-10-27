@@ -22,4 +22,8 @@ export class Tamaño {
   public static clear() : void{
     Tamaño.getInstance().index = 1;
   }
+
+  public static getValor() : number{
+    return Tamaño.getInstance().index;
+  }
 }

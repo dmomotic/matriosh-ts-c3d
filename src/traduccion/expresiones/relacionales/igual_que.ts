@@ -89,6 +89,12 @@ export class IgualQue extends NodoAST{
       Codigo3D.add(`goto ${lbl_inicio};`);
       return new Control({tipo, verdaderas, falsas});
     }
+    //Si es una comparacion string - null
+
+    //Si es una comparacion null - string
+
+    //Si es una comparacion null - null
+
   }
 
   private getTipoResultante(t1: TIPO_DATO, t2: TIPO_DATO): TIPO_DATO {

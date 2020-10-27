@@ -74,6 +74,9 @@ class IgualQue extends nodoAST_1.NodoAST {
             codigo3D_1.Codigo3D.add(`goto ${lbl_inicio};`);
             return new control_1.Control({ tipo, verdaderas, falsas });
         }
+        //Si es una comparacion string - null
+        //Si es una comparacion null - string
+        //Si es una comparacion null - null
     }
     getTipoResultante(t1, t2) {
         if ((t1 == 7 /* FLOAT */ || t1 == 6 /* INT */) && (t2 == 7 /* FLOAT */ || t2 == 6 /* INT */))
