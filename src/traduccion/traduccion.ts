@@ -30,6 +30,8 @@ import { Or } from './expresiones/logica/or';
 import { Not } from './expresiones/logica/not';
 import { UMenos } from './expresiones/aritmeticas/umenos';
 import { IgualQue } from './expresiones/relacionales/igual_que';
+import { DecFuncion } from './instrucciones/declaraciones/dec_funcion';
+import { LlamadaFuncion } from './expresiones/llamada_funcion';
 
 export class Traduccion {
   raiz: Object;
@@ -57,6 +59,7 @@ export class Traduccion {
 
     this.reservarGlobalesEnHeap();
     Codigo3D.addInit('void main()\n{');
+    Codigo3D.addInit(Codigo3D.getCodigoFunciones());
     //Codigo3D.addInit((new FuncionesPropias()).getCodigo());
     Codigo3D.add('return;');
     Codigo3D.add('}');
@@ -472,16 +475,34 @@ export class Traduccion {
       return lista_ifs;
     }
 
-    //DECLARACION_FUNCION
+    //DECLARACION_FUNCION  ---->  DecFuncion
     else if(this.soyNodo('DECLARACION_FUNCION', nodo)){
       const id = nodo.hijos[1];
-      switch(nodo.hijos){
+
+      switch(nodo.hijos.length){
         //function id par_izq par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der
         case 9:{
           //{ tipo, type_generador? }
           const tipo_funcion = this.recorrer(nodo.hijos[5]);
-          const instrucciones = this.recorrer(nodo.hijo[7]);
+          const instrucciones = this.recorrer(nodo.hijos[7]);
 
+          const linea = nodo.linea;
+          const tipo = tipo_funcion.tipo;
+          const referencia = tipo_funcion.type_generador;
+
+          return new DecFuncion({linea, id, tipo, referencia, instrucciones});
+        }
+      }
+    }
+
+    //LLAMADA_FUNCION
+    else if(this.soyNodo('LLAMADA_FUNCION', nodo)){
+      const id = nodo.hijos[0];
+
+      switch(nodo.hijos.length){
+        //id par_izq par_der punto_coma
+        case 4: {
+          return new LlamadaFuncion(nodo.linea, id);
         }
       }
     }

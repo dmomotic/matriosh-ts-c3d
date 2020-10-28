@@ -31,6 +31,8 @@ const or_1 = require("./expresiones/logica/or");
 const not_1 = require("./expresiones/logica/not");
 const umenos_1 = require("./expresiones/aritmeticas/umenos");
 const igual_que_1 = require("./expresiones/relacionales/igual_que");
+const dec_funcion_1 = require("./instrucciones/declaraciones/dec_funcion");
+const llamada_funcion_1 = require("./expresiones/llamada_funcion");
 class Traduccion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
@@ -51,6 +53,7 @@ class Traduccion {
         });
         this.reservarGlobalesEnHeap();
         codigo3D_1.Codigo3D.addInit('void main()\n{');
+        codigo3D_1.Codigo3D.addInit(codigo3D_1.Codigo3D.getCodigoFunciones());
         //Codigo3D.addInit((new FuncionesPropias()).getCodigo());
         codigo3D_1.Codigo3D.add('return;');
         codigo3D_1.Codigo3D.add('}');
@@ -442,15 +445,29 @@ class Traduccion {
             });
             return lista_ifs;
         }
-        //DECLARACION_FUNCION
+        //DECLARACION_FUNCION  ---->  DecFuncion
         else if (this.soyNodo('DECLARACION_FUNCION', nodo)) {
             const id = nodo.hijos[1];
-            switch (nodo.hijos) {
+            switch (nodo.hijos.length) {
                 //function id par_izq par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der
                 case 9: {
                     //{ tipo, type_generador? }
                     const tipo_funcion = this.recorrer(nodo.hijos[5]);
-                    const instrucciones = this.recorrer(nodo.hijo[7]);
+                    const instrucciones = this.recorrer(nodo.hijos[7]);
+                    const linea = nodo.linea;
+                    const tipo = tipo_funcion.tipo;
+                    const referencia = tipo_funcion.type_generador;
+                    return new dec_funcion_1.DecFuncion({ linea, id, tipo, referencia, instrucciones });
+                }
+            }
+        }
+        //LLAMADA_FUNCION
+        else if (this.soyNodo('LLAMADA_FUNCION', nodo)) {
+            const id = nodo.hijos[0];
+            switch (nodo.hijos.length) {
+                //id par_izq par_der punto_coma
+                case 4: {
+                    return new llamada_funcion_1.LlamadaFuncion(nodo.linea, id);
                 }
             }
         }

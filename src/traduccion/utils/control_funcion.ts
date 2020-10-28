@@ -28,6 +28,10 @@ export class ControlFuncion {
     Tamaño.clear();
   }
 
+  public static getTemporales() : string[]{
+    return ControlFuncion.getInstance().temporales;
+  }
+
   public static guardarTemporal(temp: string): void{
     if(!ControlFuncion.getInstance().temporales.includes(temp)){
       Tamaño.aumentar();
