@@ -20,7 +20,9 @@ export class LlamadaFuncion extends NodoAST{
   }
 
   traducir(ts: TablaSimbolos) {
+
     const funcion: Funcion = ts.getFuncion(this.id);
+
     //Compruebo que exista la funcion
     if(!funcion){
       Errores.push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `No existe ninguna funcion con el id: ${this.id}`}));

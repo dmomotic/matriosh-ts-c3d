@@ -65,10 +65,11 @@ export class DecFuncion extends NodoAST{
       parametro.posicion = pos_stack;
     }
     funcion = new Funcion({id: this.id, parametros: this.parametros, tamaño: Tamaño.getValor() + 1, referencia: this.referencia, tipo: this.tipo});
+    ts.setFuncion(funcion);
     const ts_local = new TablaSimbolos(ts);
 
     //Genero el codigo de la funcion
-    Codigo3D.add(`void ${this.id}\n{`);
+    Codigo3D.add(`void ${this.id}()\n{`);
 
     //Traduzco el cuerpo de la función
     for(const instruccion of this.instrucciones){

@@ -52,9 +52,10 @@ class DecFuncion extends nodoAST_1.NodoAST {
             parametro.posicion = pos_stack;
         }
         funcion = new funcion_1.Funcion({ id: this.id, parametros: this.parametros, tamaño: tama_o_1.Tamaño.getValor() + 1, referencia: this.referencia, tipo: this.tipo });
+        ts.setFuncion(funcion);
         const ts_local = new tablaSimbolos_1.TablaSimbolos(ts);
         //Genero el codigo de la funcion
-        codigo3D_1.Codigo3D.add(`void ${this.id}\n{`);
+        codigo3D_1.Codigo3D.add(`void ${this.id}()\n{`);
         //Traduzco el cuerpo de la función
         for (const instruccion of this.instrucciones) {
             instruccion.traducir(ts_local);
