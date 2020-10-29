@@ -10,6 +10,12 @@ class Stack {
             Stack.instance = new Stack();
         return Stack.instance;
     }
+    static getIndex() {
+        return Stack.getInstance().index;
+    }
+    static setIndex(value) {
+        Stack.getInstance().index = value;
+    }
     static getSiguiente() {
         return Stack.getInstance().index++;
     }

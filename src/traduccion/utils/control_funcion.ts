@@ -32,6 +32,10 @@ export class ControlFuncion {
     return ControlFuncion.getInstance().temporales;
   }
 
+  public static getTemporalesLength() : number{
+    return ControlFuncion.getTemporales().length;
+  }
+
   public static guardarTemporal(temp: string): void{
     if(!ControlFuncion.getInstance().temporales.includes(temp)){
       Tamaño.aumentar();

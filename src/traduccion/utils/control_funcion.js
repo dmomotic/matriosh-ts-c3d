@@ -18,6 +18,9 @@ class ControlFuncion {
     static getTemporales() {
         return ControlFuncion.getInstance().temporales;
     }
+    static getTemporalesLength() {
+        return ControlFuncion.getTemporales().length;
+    }
     static guardarTemporal(temp) {
         if (!ControlFuncion.getInstance().temporales.includes(temp)) {
             tama_o_1.Tamaño.aumentar();

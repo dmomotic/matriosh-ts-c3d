@@ -1,5 +1,6 @@
 import { Funcion } from "./funcion";
 import { Variable } from "./variable";
+import * as _ from 'lodash';
 
 export class TablaSimbolos{
   padre: TablaSimbolos;
@@ -34,7 +35,7 @@ export class TablaSimbolos{
 
   getFuncion(id: string) : Funcion{
     const ts = this.getGlobal();
-    return ts.funciones.get(id);
+    return _.cloneDeep( ts.funciones.get(id));
   }
 
   getGlobal() : TablaSimbolos{

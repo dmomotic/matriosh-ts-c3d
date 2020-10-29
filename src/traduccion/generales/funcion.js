@@ -5,6 +5,9 @@ class Funcion {
     constructor({ id, parametros = [], tamaño = 1, tipo = 5 /* VOID */, referencia = null, tipo_de_arreglo = null, dimensiones = [] }) {
         Object.assign(this, { id, parametros, tamaño, tipo, referencia, tipo_de_arreglo, dimensiones });
     }
+    getParametro(index) {
+        return this.parametros[index];
+    }
     hasParametros() {
         return this.parametros.length > 0;
     }

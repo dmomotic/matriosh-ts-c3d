@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TablaSimbolos = void 0;
+const _ = require("lodash");
 class TablaSimbolos {
     constructor(padre = null) {
         this.variables = new Map();
@@ -27,7 +28,7 @@ class TablaSimbolos {
     }
     getFuncion(id) {
         const ts = this.getGlobal();
-        return ts.funciones.get(id);
+        return _.cloneDeep(ts.funciones.get(id));
     }
     getGlobal() {
         for (let ts = this; ts != null; ts = ts.padre) {

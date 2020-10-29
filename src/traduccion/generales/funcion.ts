@@ -14,6 +14,10 @@ export class Funcion {
     Object.assign(this, {id, parametros, tamaño, tipo, referencia, tipo_de_arreglo, dimensiones});
   }
 
+  getParametro(index: number) : Variable {
+    return this.parametros[index];
+  }
+
   hasParametros() : boolean {
     return this.parametros.length > 0;
   }

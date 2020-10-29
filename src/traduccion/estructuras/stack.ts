@@ -11,6 +11,14 @@ export class Stack {
     return Stack.instance;
   }
 
+  public static getIndex(): number{
+    return Stack.getInstance().index;
+  }
+
+  public static setIndex(value: number) : void{
+    Stack.getInstance().index = value;
+  }
+
   public static getSiguiente() : number{
     return Stack.getInstance().index++;
   }
