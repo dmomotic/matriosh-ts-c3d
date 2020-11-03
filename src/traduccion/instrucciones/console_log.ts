@@ -43,6 +43,7 @@ export class ConsoleLog extends NodoAST {
             Codigo3D.add(`printf("%d",(int)${control_exp.temporal});`);
             break;
           case TIPO_DATO.FLOAT:
+          case TIPO_DATO.NUMBER:
             Codigo3D.add(`printf("%f",${control_exp.temporal});`);
             break;
           case TIPO_DATO.STRING: {
@@ -70,6 +71,10 @@ export class ConsoleLog extends NodoAST {
             Codigo3D.add(`goto ${lbl_ciclo};`);
             //Etiqueta si el string es null
             Codigo3D.add(`${lbl_null}:`);
+            Codigo3D.add(`printf("%c", ${'n'.charCodeAt(0)});`);
+            Codigo3D.add(`printf("%c", ${'u'.charCodeAt(0)});`);
+            Codigo3D.add(`printf("%c", ${'l'.charCodeAt(0)});`);
+            Codigo3D.add(`printf("%c", ${'l'.charCodeAt(0)});`);
             //Etiqueta final ciclo while
             Codigo3D.add(`${lbl_false}:`);
             break;
@@ -98,9 +103,9 @@ export class ConsoleLog extends NodoAST {
             Codigo3D.add(`${lbl_fin}:`);
           }
         }
-        Codigo3D.add(`printf("\\n");`);
-        Codigo3D.addComentario('FIN CONSOLE.LOG()');
       }
+      Codigo3D.add(`printf("\\n");`);
+      Codigo3D.addComentario('FIN CONSOLE.LOG()');
     }
   }
 

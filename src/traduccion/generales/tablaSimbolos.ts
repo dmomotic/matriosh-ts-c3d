@@ -17,12 +17,12 @@ export class TablaSimbolos{
     if(this.esGlobal()){
       variable.setAsGlobal();
     }
-    this.variables.set(variable.id, variable);
+    this.variables.set(variable.id.toLowerCase(), variable);
   }
 
   getVariable(id: string) : Variable{
     for(let ts : TablaSimbolos = this; ts != null; ts = ts.padre){
-      const variable = ts.variables.get(id);
+      const variable = ts.variables.get(id.toLowerCase());
       if(variable) return variable;
     }
     return null;
@@ -30,12 +30,12 @@ export class TablaSimbolos{
 
   setFuncion(funcion: Funcion) : void{
     const ts = this.getGlobal();
-    ts.funciones.set(funcion.id, funcion);
+    ts.funciones.set(funcion.id.toLowerCase(), funcion);
   }
 
   getFuncion(id: string) : Funcion{
     const ts = this.getGlobal();
-    return _.cloneDeep( ts.funciones.get(id));
+    return _.cloneDeep( ts.funciones.get(id.toLowerCase()));
   }
 
   getGlobal() : TablaSimbolos{

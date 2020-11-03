@@ -36,6 +36,7 @@ class ConsoleLog extends nodoAST_1.NodoAST {
                         codigo3D_1.Codigo3D.add(`printf("%d",(int)${control_exp.temporal});`);
                         break;
                     case 7 /* FLOAT */:
+                    case 1 /* NUMBER */:
                         codigo3D_1.Codigo3D.add(`printf("%f",${control_exp.temporal});`);
                         break;
                     case 0 /* STRING */: {
@@ -63,6 +64,10 @@ class ConsoleLog extends nodoAST_1.NodoAST {
                         codigo3D_1.Codigo3D.add(`goto ${lbl_ciclo};`);
                         //Etiqueta si el string es null
                         codigo3D_1.Codigo3D.add(`${lbl_null}:`);
+                        codigo3D_1.Codigo3D.add(`printf("%c", ${'n'.charCodeAt(0)});`);
+                        codigo3D_1.Codigo3D.add(`printf("%c", ${'u'.charCodeAt(0)});`);
+                        codigo3D_1.Codigo3D.add(`printf("%c", ${'l'.charCodeAt(0)});`);
+                        codigo3D_1.Codigo3D.add(`printf("%c", ${'l'.charCodeAt(0)});`);
                         //Etiqueta final ciclo while
                         codigo3D_1.Codigo3D.add(`${lbl_false}:`);
                         break;
@@ -91,9 +96,9 @@ class ConsoleLog extends nodoAST_1.NodoAST {
                         codigo3D_1.Codigo3D.add(`${lbl_fin}:`);
                     }
                 }
-                codigo3D_1.Codigo3D.add(`printf("\\n");`);
-                codigo3D_1.Codigo3D.addComentario('FIN CONSOLE.LOG()');
             }
+            codigo3D_1.Codigo3D.add(`printf("\\n");`);
+            codigo3D_1.Codigo3D.addComentario('FIN CONSOLE.LOG()');
         }
     }
 }

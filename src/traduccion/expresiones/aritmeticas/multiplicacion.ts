@@ -35,7 +35,6 @@ export class Multiplicacion extends NodoAST {
     //Comprobacion de tipo
     const tipo = this.getTipoResultante(control_izq.tipo, control_der.tipo);
     if (tipo === TIPO_DATO.NULL) {
-
       Errores.push(new Error({ tipo: 'semantico', linea: this.linea, descripcion: `No se puede realizar una multiplicacion con los tipos ${getNombreDeTipo(control_izq.tipo)} y ${getNombreDeTipo(control_der.tipo)}` }));
       return;
     }

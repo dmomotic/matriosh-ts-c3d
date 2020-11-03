@@ -18,6 +18,10 @@ export class Funcion {
     return this.parametros[index];
   }
 
+  hasParametro(id: string) : boolean{
+    return this.parametros.some(item => item.id == id);
+  }
+
   hasParametros() : boolean {
     return this.parametros.length > 0;
   }

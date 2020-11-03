@@ -51,6 +51,8 @@ class LlamadaFuncion extends nodoAST_1.NodoAST {
             const temp_pos = temporal_1.Temporal.getSiguiente();
             codigo3D_1.Codigo3D.add(`${temp_pos} = ${temp_cambio} + ${parametro.posicion};`);
             codigo3D_1.Codigo3D.add(`Stack[(int)${temp_pos}] = ${control.temporal};`);
+            //Remover temporales de controles generados en la traduccion
+            control_funcion_1.ControlFuncion.removerTemporal(control.temporal);
         }
         //Cambio real de ambito
         codigo3D_1.Codigo3D.add(`P = P + ${stack_1.Stack.getIndex()};`);
@@ -71,6 +73,11 @@ class LlamadaFuncion extends nodoAST_1.NodoAST {
             const temp_recuperado = temporal_1.Temporal.getSiguiente();
             codigo3D_1.Codigo3D.add(`${temp_recuperado} = P + ${stack_1.Stack.getSiguiente()};`);
             codigo3D_1.Codigo3D.add(`${temp} = Stack[(int)${temp_recuperado}];`);
+        }
+        codigo3D_1.Codigo3D.addComentario(`FIN RECUPERACION TEMPORALES GUARDADOS`);
+        //Reduzco puntero del stack luego de recuperar
+        for (const t in control_funcion_1.ControlFuncion.getTemporales()) {
+            stack_1.Stack.getAnterior();
         }
         if (funcion.hasReturn()) {
             control_funcion_1.ControlFuncion.guardarTemporal(temp_retorno);

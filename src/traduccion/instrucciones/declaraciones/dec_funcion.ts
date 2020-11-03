@@ -7,6 +7,7 @@ import { NodoAST } from "../../generales/nodoAST";
 import { TablaSimbolos } from "../../generales/tablaSimbolos";
 import { TIPO_DATO } from "../../generales/tipos";
 import { Variable } from "../../generales/variable";
+import { ControlFuncion } from "../../utils/control_funcion";
 import { Tamaño } from "../../utils/tamaño";
 
 export class DecFuncion extends NodoAST{
@@ -59,14 +60,24 @@ export class DecFuncion extends NodoAST{
     //Imprimo solo para estar seguro
     Codigo3D.addComentario(`El tamaño de la funcion ${this.id} es de ${Tamaño.getValor()}`);
 
+    //Entorno local
+    const ts_local = new TablaSimbolos(ts);
+
     //Declaro asigno una posicion a cada parametro
     for(const parametro of this.parametros){
       const pos_stack = Stack.getSiguiente();
       parametro.posicion = pos_stack;
+      //Ajusto el tipo number a float ya que no tengo forma de identificarlo mas adelante
+      parametro.tipo = parametro.tipo != TIPO_DATO.NUMBER ? parametro.tipo : TIPO_DATO.FLOAT;
+      ts_local.setVariable(parametro);
     }
-    funcion = new Funcion({id: this.id, parametros: this.parametros, tamaño: Tamaño.getValor() + 1, referencia: this.referencia, tipo: this.tipo});
+    //Ajusto el tipo number a float ya que no tengo forma de identificarlo mas adelante
+    funcion = new Funcion({id: this.id, parametros: this.parametros, tamaño: Tamaño.getValor() + 1, referencia: this.referencia, tipo: this.tipo != TIPO_DATO.NUMBER ? this.tipo : TIPO_DATO.FLOAT});
     ts.setFuncion(funcion);
-    const ts_local = new TablaSimbolos(ts);
+    //TODO: asignar valores al control funcion
+    ControlFuncion.setId(this.id);
+    ControlFuncion.setReferencia(this.referencia);
+    ControlFuncion.setTipo(this.tipo);
 
     //Genero el codigo de la funcion
     Codigo3D.add(`void ${this.id}()\n{`);
@@ -76,12 +87,14 @@ export class DecFuncion extends NodoAST{
       instruccion.traducir(ts_local);
     }
 
-    Codigo3D.add(`return;`);
+    Codigo3D.add(`return; //Obligatorio al final`);
     Codigo3D.add(`}`);
 
     //Global para el control en la traduccion
     Codigo3D.getInstance().traduciendo_funcion = false;
 
+    //Reestablezco el control de la funcion
+    ControlFuncion.clear();
   }
 
 }

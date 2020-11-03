@@ -12,11 +12,11 @@ class TablaSimbolos {
         if (this.esGlobal()) {
             variable.setAsGlobal();
         }
-        this.variables.set(variable.id, variable);
+        this.variables.set(variable.id.toLowerCase(), variable);
     }
     getVariable(id) {
         for (let ts = this; ts != null; ts = ts.padre) {
-            const variable = ts.variables.get(id);
+            const variable = ts.variables.get(id.toLowerCase());
             if (variable)
                 return variable;
         }
@@ -24,11 +24,11 @@ class TablaSimbolos {
     }
     setFuncion(funcion) {
         const ts = this.getGlobal();
-        ts.funciones.set(funcion.id, funcion);
+        ts.funciones.set(funcion.id.toLowerCase(), funcion);
     }
     getFuncion(id) {
         const ts = this.getGlobal();
-        return _.cloneDeep(ts.funciones.get(id));
+        return _.cloneDeep(ts.funciones.get(id.toLowerCase()));
     }
     getGlobal() {
         for (let ts = this; ts != null; ts = ts.padre) {

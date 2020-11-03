@@ -40,10 +40,14 @@ export class Variable {
   }
 
   isNumeric(): boolean{
-    return this.tipo === TIPO_DATO.INT || this.tipo === TIPO_DATO.FLOAT;
+    return this.tipo === TIPO_DATO.INT || this.tipo === TIPO_DATO.FLOAT || this.tipo == TIPO_DATO.NUMBER;
   }
 
   isBoolean(): boolean{
     return this.tipo === TIPO_DATO.BOOLEAN;
+  }
+
+  isReasignable() : boolean {
+    return this.reasignable;
   }
 }

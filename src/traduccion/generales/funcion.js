@@ -8,6 +8,9 @@ class Funcion {
     getParametro(index) {
         return this.parametros[index];
     }
+    hasParametro(id) {
+        return this.parametros.some(item => item.id == id);
+    }
     hasParametros() {
         return this.parametros.length > 0;
     }

@@ -6,7 +6,7 @@ import { Codigo3D } from "../../generales/codigo3D";
 import { NodoAST } from "../../generales/nodoAST";
 import { TablaSimbolos } from "../../generales/tablaSimbolos";
 import { Temporal } from "../../generales/temporal";
-import { getNombreDeTipo, getTypeOfNumber, tiposValidos, TIPO_DATO } from "../../generales/tipos";
+import { getNombreDeTipo, getTypeOfNumber, isTipoArray, isTipoNull, isTipoString, isTipoType, tiposValidos, TIPO_DATO } from "../../generales/tipos";
 import { Variable } from "../../generales/variable";
 import { Control } from "../../utils/control";
 import { ControlFuncion } from "../../utils/control_funcion";
@@ -49,7 +49,7 @@ export class DecIdTipoExp extends NodoAST{
     }
 
     //Compruebo la compatibilidad entre tipos
-    if(!tiposValidos(this.tipo, control_exp.tipo)){
+    if(!this.comprobarTipos(this.tipo, control_exp.tipo)){
       Errores.push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `El tipo declarado y el tipo asignado del id: ${this.id} no son iguales`}));
       return;
     }
@@ -62,7 +62,7 @@ export class DecIdTipoExp extends NodoAST{
       //Si es number o boolean o string
       if(this.tipo == TIPO_DATO.NUMBER || this.tipo == TIPO_DATO.BOOLEAN || this.tipo == TIPO_DATO.STRING){
         //Validacion para strings
-        const tipo = this.tipo == TIPO_DATO.STRING ? TIPO_DATO.STRING : control_exp.tipo;
+        const tipo = (isTipoString(this.tipo) || isTipoArray(this.tipo) || isTipoType(this.tipo)) ? this.tipo : control_exp.tipo;
 
         Codigo3D.addComentario(`Declaracion y asignación de id: ${this.id} tipo ${getNombreDeTipo(tipo)}`);
         const pos = Heap.getSiguiente();
@@ -81,7 +81,7 @@ export class DecIdTipoExp extends NodoAST{
       //Si es number o bolean o string
       if(this.tipo === TIPO_DATO.NUMBER || this.tipo === TIPO_DATO.BOOLEAN || this.tipo == TIPO_DATO.STRING){
         //Validacion para strings
-        const tipo = this.tipo == TIPO_DATO.STRING ? TIPO_DATO.STRING : control_exp.tipo;
+        const tipo = (isTipoString(this.tipo) || isTipoArray(this.tipo) || isTipoType(this.tipo)) ? this.tipo : control_exp.tipo;
 
         Codigo3D.addComentario(`Declaracion y asignación de id: ${this.id} tipo ${getNombreDeTipo(tipo)}`);
         const pos = Stack.getSiguiente();
@@ -96,4 +96,24 @@ export class DecIdTipoExp extends NodoAST{
     }
   }
 
+  comprobarTipos(t1: TIPO_DATO, t2: TIPO_DATO) : boolean{
+    if (t1 === t2) return true;
+    //Si el tipo1 es NUMBER
+    if (t1 === TIPO_DATO.NUMBER && (t2 === TIPO_DATO.INT || t2 === TIPO_DATO.FLOAT)) {
+      return true;
+    }
+    //Si el tipo2 es NUMBER
+    if (t2 === TIPO_DATO.NUMBER && (t1 === TIPO_DATO.INT || t1 === TIPO_DATO.FLOAT)) {
+      return true;
+    }
+
+    //string - null
+    //array - null
+    //type - null
+    if((isTipoString(t1) || isTipoArray(t1) || isTipoType(t1)) && isTipoNull(t2)){
+      return true;
+    }
+
+    return false;
+  }
 }

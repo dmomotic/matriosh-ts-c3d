@@ -36,7 +36,7 @@ class DecIdTipoExp extends nodoAST_1.NodoAST {
             return;
         }
         //Compruebo la compatibilidad entre tipos
-        if (!tipos_1.tiposValidos(this.tipo, control_exp.tipo)) {
+        if (!this.comprobarTipos(this.tipo, control_exp.tipo)) {
             errores_1.Errores.push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `El tipo declarado y el tipo asignado del id: ${this.id} no son iguales` }));
             return;
         }
@@ -47,7 +47,7 @@ class DecIdTipoExp extends nodoAST_1.NodoAST {
             //Si es number o boolean o string
             if (this.tipo == 1 /* NUMBER */ || this.tipo == 2 /* BOOLEAN */ || this.tipo == 0 /* STRING */) {
                 //Validacion para strings
-                const tipo = this.tipo == 0 /* STRING */ ? 0 /* STRING */ : control_exp.tipo;
+                const tipo = (tipos_1.isTipoString(this.tipo) || tipos_1.isTipoArray(this.tipo) || tipos_1.isTipoType(this.tipo)) ? this.tipo : control_exp.tipo;
                 codigo3D_1.Codigo3D.addComentario(`Declaracion y asignación de id: ${this.id} tipo ${tipos_1.getNombreDeTipo(tipo)}`);
                 const pos = heap_1.Heap.getSiguiente();
                 const temp_pos = temporal_1.Temporal.getSiguiente();
@@ -63,7 +63,7 @@ class DecIdTipoExp extends nodoAST_1.NodoAST {
             //Si es number o bolean o string
             if (this.tipo === 1 /* NUMBER */ || this.tipo === 2 /* BOOLEAN */ || this.tipo == 0 /* STRING */) {
                 //Validacion para strings
-                const tipo = this.tipo == 0 /* STRING */ ? 0 /* STRING */ : control_exp.tipo;
+                const tipo = (tipos_1.isTipoString(this.tipo) || tipos_1.isTipoArray(this.tipo) || tipos_1.isTipoType(this.tipo)) ? this.tipo : control_exp.tipo;
                 codigo3D_1.Codigo3D.addComentario(`Declaracion y asignación de id: ${this.id} tipo ${tipos_1.getNombreDeTipo(tipo)}`);
                 const pos = stack_1.Stack.getSiguiente();
                 const temp_pos = temporal_1.Temporal.getSiguiente();
@@ -73,6 +73,25 @@ class DecIdTipoExp extends nodoAST_1.NodoAST {
                 ts.setVariable(variable);
             }
         }
+    }
+    comprobarTipos(t1, t2) {
+        if (t1 === t2)
+            return true;
+        //Si el tipo1 es NUMBER
+        if (t1 === 1 /* NUMBER */ && (t2 === 6 /* INT */ || t2 === 7 /* FLOAT */)) {
+            return true;
+        }
+        //Si el tipo2 es NUMBER
+        if (t2 === 1 /* NUMBER */ && (t1 === 6 /* INT */ || t1 === 7 /* FLOAT */)) {
+            return true;
+        }
+        //string - null
+        //array - null
+        //type - null
+        if ((tipos_1.isTipoString(t1) || tipos_1.isTipoArray(t1) || tipos_1.isTipoType(t1)) && tipos_1.isTipoNull(t2)) {
+            return true;
+        }
+        return false;
     }
 }
 exports.DecIdTipoExp = DecIdTipoExp;
