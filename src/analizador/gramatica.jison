@@ -42,6 +42,9 @@
 'graficar_ts' return 'graficar_ts';
 'Array' return 'Array';
 'charat' return 'charat';
+'ToLowerCase' return 'toLowerCase';
+'ToUpperCase' return 'toUpperCase';
+'concat' return 'concat';
 
 //Signos
 ';' return 'punto_coma';
@@ -403,6 +406,9 @@ EXP
   | ACCESO_ARREGLO { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
   | LENGTH { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
   | CHAR_AT /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
+  | TO_LOWER_CASE /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
+  | TO_UPPER_CASE /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
+  | CONCAT { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
   | ARRAY_POP { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
   //Types - accesos
   | ACCESO_TYPE { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
@@ -434,10 +440,28 @@ LENGTH
   | id LISTA_ACCESOS_TYPE punto length { $$ = new NodoAST({label: 'LENGTH', hijos: [$1,$2,$3,$4], linea: yylineno}); }
 ;
 
-CHAR_AT
+CHAR_AT /**--> YA <--**/
   : id punto charat par_izq EXP par_der /**--> YA <--**/ { $$ = new NodoAST({label: 'CHAR_AT', hijos: [$1,$2,$3,$4,$5,$6], linea: yylineno}); }
   | string punto charat par_izq EXP par_der /**--> YA <--**/ { $$ = new NodoAST({label: 'CHAR_AT', hijos: [new NodoAST({label: 'STRING', hijos: [$1], linea: yylineno}),$2,$3,$4,$5,$6], linea: yylineno}); }
   | par_izq EXP par_der punto charat par_izq EXP par_der /**--> YA <--**/ { $$ = new NodoAST({label: 'CHAR_AT', hijos: [$1,$2,$3,$4,$5,$6,$7,$8], linea: yylineno}); }
+;
+
+TO_LOWER_CASE /**--> YA <--**/
+  : id punto toLowerCase par_izq par_der /**--> YA <--**/ { $$ = new NodoAST({label: 'TO_LOWER_CASE', hijos: [$1,$2,$3,$4,$5], linea: yylineno}); }
+  | string punto toLowerCase par_izq par_der /**--> YA <--**/ { $$ = new NodoAST({label: 'TO_LOWER_CASE', hijos: [new NodoAST({label: 'STRING', hijos: [$1], linea: yylineno}),$2,$3,$4,$5], linea: yylineno}); }
+  | par_izq EXP par_der punto toLowerCase par_izq par_der /**--> YA <--**/ { $$ = new NodoAST({label: 'TO_LOWER_CASE', hijos: [$1,$2,$3,$4,$5,$6,$7], linea: yylineno}); }
+;
+
+TO_UPPER_CASE /**--> YA <--**/
+  : id punto toUpperCase par_izq par_der /**--> YA <--**/{ $$ = new NodoAST({label: 'TO_UPPER_CASE', hijos: [$1,$2,$3,$4,$5], linea: yylineno}); }
+  | string punto toUpperCase par_izq par_der /**--> YA <--**/ { $$ = new NodoAST({label: 'TO_UPPER_CASE', hijos: [new NodoAST({label: 'STRING', hijos: [$1], linea: yylineno}),$2,$3,$4,$5], linea: yylineno}); }
+  | par_izq EXP par_der punto toUpperCase par_izq par_der /**--> YA <--**/ { $$ = new NodoAST({label: 'TO_UPPER_CASE', hijos: [$1,$2,$3,$4,$5,$6,$7], linea: yylineno}); }
+;
+
+CONCAT
+  : id punto concat par_izq EXP par_der { $$ = new NodoAST({label: 'CONCAT', hijos: [$1,$2,$3,$4,$5,$6], linea: yylineno}); }
+  | string punto concat par_izq EXP par_der { $$ = new NodoAST({label: 'CONCAT', hijos: [new NodoAST({label: 'STRING', hijos: [$1], linea: yylineno}),$2,$3,$4,$5,$6], linea: yylineno}); }
+  | par_izq EXP par_der punto concat par_izq EXP par_der { $$ = new NodoAST({label: 'CONCAT', hijos: [$1,$2,$3,$4,$5,$6,$7,$8], linea: yylineno}); }
 ;
 
 ARRAY_POP

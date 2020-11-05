@@ -38,8 +38,11 @@ import { Break } from './instrucciones/flujo/break';
 import { Case } from './estructuras/case';
 import { Switch } from './instrucciones/condicionales/switch';
 import { AsignacionId } from './instrucciones/asignaciones/asignacion_id';
-import { Length } from './expresiones/length/length';
-import { CharAt } from './expresiones/charAt/char_at';
+import { Length } from './expresiones/cadenas/length';
+import { CharAt } from './expresiones/cadenas/char_at';
+import { ToUpperCase } from './expresiones/cadenas/to_upper_case';
+import { ToLowerCase } from './expresiones/cadenas/to_lower_case';
+import { Concat } from './expresiones/cadenas/concat';
 
 export class Traduccion {
   raiz: Object;
@@ -700,6 +703,75 @@ export class Traduccion {
           const exp = this.recorrer(nodo.hijos[1]);
           const pos = this.recorrer(nodo.hijos[6]);
           return new CharAt({linea, exp, pos});
+      }
+    }
+
+    //TO_UPPER_CASE
+    else if(this.soyNodo('TO_UPPER_CASE', nodo)){
+      const linea = nodo.linea;
+      switch(nodo.hijos.length){
+        case 5:
+          //string punto toUpperCase par_izq par_der
+          if(this.soyNodo('STRING', nodo.hijos[0])){
+            const exp = this.recorrer(nodo.hijos[0]);
+            return new ToUpperCase({linea, exp});
+          }
+          //id punto toUpperCase par_izq par_der
+          else{
+            const id = nodo.hijos[0];
+            return new ToUpperCase({linea, id});
+          }
+        case 7:
+          //par_izq EXP par_der punto toUpperCase par_izq par_der
+          const exp = this.recorrer(nodo.hijos[1]);
+          return new ToUpperCase({linea, exp});
+      }
+    }
+
+    //TO_LOWER_CASE
+    else if(this.soyNodo('TO_LOWER_CASE', nodo)){
+      const linea = nodo.linea;
+      switch(nodo.hijos.length){
+        case 5:
+          //string punto toLowerCase par_izq par_der
+          if(this.soyNodo('STRING', nodo.hijos[0])){
+            const exp = this.recorrer(nodo.hijos[0]);
+            return new ToLowerCase({linea, exp});
+          }
+          //id punto toLowerCase par_izq par_der
+          else{
+            const id = nodo.hijos[0];
+            return new ToLowerCase({linea, id});
+          }
+        case 7:
+          //par_izq EXP par_der punto toLowerCase par_izq par_der
+          const exp = this.recorrer(nodo.hijos[1]);
+          return new ToLowerCase({linea, exp});
+      }
+    }
+
+    //CONCAT
+    else if(this.soyNodo('CONCAT', nodo)){
+      const linea = nodo.linea;
+      switch(nodo.hijos.length){
+        case 6:
+          //string punto concat par_izq EXP par_der
+          if(this.soyNodo('STRING', nodo.hijos[0]) && this.soyNodo('EXP', nodo.hijos[4])){
+            const cad1 = this.recorrer(nodo.hijos[0]);
+            const cad2 = this.recorrer(nodo.hijos[4]);
+            return new Concat({linea, cad1, cad2});
+          }
+          //id punto concat par_izq EXP par_der
+          else if(this.soyNodo('EXP', nodo.hijos[4])){
+            const id = nodo.hijos[0];
+            const cad2 = this.recorrer(nodo.hijos[4]);
+            return new Concat({linea, id, cad2});
+          }
+        case 8:
+          //par_izq EXP par_der punto concat par_izq EXP par_der
+          const cad1 = this.recorrer(nodo.hijos[1]);
+          const cad2 = this.recorrer(nodo.hijos[6]);
+          return new Concat({linea, cad1, cad2});
       }
     }
   }
