@@ -402,7 +402,7 @@ EXP
   | cor_izq cor_der { $$ = new NodoAST({label: 'EXP', hijos: [$1,$2], linea: yylineno}); }
   | ACCESO_ARREGLO { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
   | LENGTH { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
-  | CHAR_AT { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
+  | CHAR_AT /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
   | ARRAY_POP { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
   //Types - accesos
   | ACCESO_TYPE { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
@@ -435,9 +435,9 @@ LENGTH
 ;
 
 CHAR_AT
-  : id punto charat par_izq EXP par_der { $$ = new NodoAST({label: 'CHAR_AT', hijos: [$1,$2,$3,$5,$6], linea: yylineno}); }
-  | string punto charat par_izq EXP par_der { $$ = new NodoAST({label: 'CHAR_AT', hijos: [new NodoAST({label: 'STRING', hijos: [$1], linea: yylineno}),$2,$3,$4,$5,$6], linea: yylineno}); }
-  | par_izq EXP par_der punto charat par_izq EXP par_der { $$ = new NodoAST({label: 'CHAR_AT', hijos: [$1,$2,$3,$4,$5,$6,$7,$8], linea: yylineno}); }
+  : id punto charat par_izq EXP par_der /**--> YA <--**/ { $$ = new NodoAST({label: 'CHAR_AT', hijos: [$1,$2,$3,$4,$5,$6], linea: yylineno}); }
+  | string punto charat par_izq EXP par_der /**--> YA <--**/ { $$ = new NodoAST({label: 'CHAR_AT', hijos: [new NodoAST({label: 'STRING', hijos: [$1], linea: yylineno}),$2,$3,$4,$5,$6], linea: yylineno}); }
+  | par_izq EXP par_der punto charat par_izq EXP par_der /**--> YA <--**/ { $$ = new NodoAST({label: 'CHAR_AT', hijos: [$1,$2,$3,$4,$5,$6,$7,$8], linea: yylineno}); }
 ;
 
 ARRAY_POP

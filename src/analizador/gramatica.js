@@ -333,7 +333,7 @@ case 143: case 144:
  this.$ = new NodoAST({label: 'LENGTH', hijos: [$$[$0-3],$$[$0-2],$$[$0-1],$$[$0]], linea: yylineno}); 
 break;
 case 145:
- this.$ = new NodoAST({label: 'CHAR_AT', hijos: [$$[$0-5],$$[$0-4],$$[$0-3],$$[$0-1],$$[$0]], linea: yylineno}); 
+ this.$ = new NodoAST({label: 'CHAR_AT', hijos: [$$[$0-5],$$[$0-4],$$[$0-3],$$[$0-2],$$[$0-1],$$[$0]], linea: yylineno}); 
 break;
 case 146:
  this.$ = new NodoAST({label: 'CHAR_AT', hijos: [new NodoAST({label: 'STRING', hijos: [$$[$0-5]], linea: yylineno}),$$[$0-4],$$[$0-3],$$[$0-2],$$[$0-1],$$[$0]], linea: yylineno}); 

@@ -40,6 +40,7 @@ const case_1 = require("./estructuras/case");
 const switch_1 = require("./instrucciones/condicionales/switch");
 const asignacion_id_1 = require("./instrucciones/asignaciones/asignacion_id");
 const length_1 = require("./expresiones/length/length");
+const char_at_1 = require("./expresiones/charAt/char_at");
 class Traduccion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
@@ -630,6 +631,27 @@ class Traduccion {
         }
         //CHAR_AT
         else if (this.soyNodo('CHAR_AT', nodo)) {
+            const linea = nodo.linea;
+            switch (nodo.hijos.length) {
+                case 6:
+                    //string punto charat par_izq EXP par_der
+                    if (this.soyNodo('STRING', nodo.hijos[0]) && this.soyNodo('EXP', nodo.hijos[4])) {
+                        const exp = this.recorrer(nodo.hijos[0]);
+                        const pos = this.recorrer(nodo.hijos[4]);
+                        return new char_at_1.CharAt({ linea, exp, pos });
+                    }
+                    //id punto charat par_izq EXP par_der
+                    else if (this.soyNodo('EXP', nodo.hijos[4])) {
+                        const id = nodo.hijos[0];
+                        const pos = this.recorrer(nodo.hijos[4]);
+                        return new char_at_1.CharAt({ linea, id, pos });
+                    }
+                case 8:
+                    //par_izq EXP par_der punto charat par_izq EXP par_der
+                    const exp = this.recorrer(nodo.hijos[1]);
+                    const pos = this.recorrer(nodo.hijos[6]);
+                    return new char_at_1.CharAt({ linea, exp, pos });
+            }
         }
     }
     /**
