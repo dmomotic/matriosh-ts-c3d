@@ -44,6 +44,7 @@ const char_at_1 = require("./expresiones/cadenas/char_at");
 const to_upper_case_1 = require("./expresiones/cadenas/to_upper_case");
 const to_lower_case_1 = require("./expresiones/cadenas/to_lower_case");
 const concat_1 = require("./expresiones/cadenas/concat");
+const while_1 = require("./instrucciones/ciclos/while");
 class Traduccion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
@@ -721,6 +722,13 @@ class Traduccion {
                     const cad2 = this.recorrer(nodo.hijos[6]);
                     return new concat_1.Concat({ linea, cad1, cad2 });
             }
+        }
+        //WHILE
+        else if (this.soyNodo('WHILE', nodo)) {
+            //while par_izq EXP par_der llave_izq INSTRUCCIONES llave_der
+            const condicion = this.recorrer(nodo.hijos[2]);
+            const instrucciones = this.recorrer(nodo.hijos[5]);
+            return new while_1.While(nodo.linea, condicion, instrucciones);
         }
     }
     /**

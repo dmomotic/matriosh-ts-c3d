@@ -43,6 +43,7 @@ import { CharAt } from './expresiones/cadenas/char_at';
 import { ToUpperCase } from './expresiones/cadenas/to_upper_case';
 import { ToLowerCase } from './expresiones/cadenas/to_lower_case';
 import { Concat } from './expresiones/cadenas/concat';
+import { While } from './instrucciones/ciclos/while';
 
 export class Traduccion {
   raiz: Object;
@@ -773,6 +774,14 @@ export class Traduccion {
           const cad2 = this.recorrer(nodo.hijos[6]);
           return new Concat({linea, cad1, cad2});
       }
+    }
+
+    //WHILE
+    else if(this.soyNodo('WHILE', nodo)){
+      //while par_izq EXP par_der llave_izq INSTRUCCIONES llave_der
+      const condicion = this.recorrer(nodo.hijos[2]);
+      const instrucciones = this.recorrer(nodo.hijos[5]);
+      return new While(nodo.linea, condicion, instrucciones);
     }
   }
 
