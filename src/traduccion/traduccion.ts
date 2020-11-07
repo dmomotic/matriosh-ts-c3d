@@ -44,6 +44,9 @@ import { ToUpperCase } from './expresiones/cadenas/to_upper_case';
 import { ToLowerCase } from './expresiones/cadenas/to_lower_case';
 import { Concat } from './expresiones/cadenas/concat';
 import { While } from './instrucciones/ciclos/while';
+import { Incremento } from './expresiones/aritmeticas/incremento';
+import { Decremento } from './expresiones/aritmeticas/decremento';
+import { DoWhile } from './instrucciones/ciclos/do_while';
 
 export class Traduccion {
   raiz: Object;
@@ -264,112 +267,122 @@ export class Traduccion {
 
             //Si es un objeto
             if (exp instanceof Object) return exp;
+        }
+        case 2:
+          /*****************************
+           * OPERACIONES ARITMENTICAS
+           *****************************/
+          //menos EXP
+          if(nodo.hijos[0] == '-' && this.soyNodo('EXP',nodo.hijos[1])){
+            const exp : NodoAST = this.recorrer(nodo.hijos[1]);
+            return new UMenos(nodo.linea, exp);
           }
-          case 2:
-            /*****************************
-             * OPERACIONES ARITMENTICAS
-             *****************************/
-            //menos EXP
-            if(nodo.hijos[0] == '-' && this.soyNodo('EXP',nodo.hijos[1])){
-              const exp : NodoAST = this.recorrer(nodo.hijos[1]);
-              return new UMenos(nodo.linea, exp);
-            }
-            /*****************************
-             * OPERACIONES LOGICAS
-             *****************************/
-            //not EXP
-            if(nodo.hijos[0] == '!' && this.soyNodo('EXP',nodo.hijos[1])){
-              const exp : NodoAST = this.recorrer(nodo.hijos[1]);
-              return new Not(nodo.linea, exp);
-            }
-          case 3:
-            /*****************************
-             * OPERACIONES ARITMENTICAS
-             *****************************/
-            //EXP mas EXP
-            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '+' && this.soyNodo('EXP', nodo.hijos[2])){
-              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
-              return new Suma(nodo.linea, op_izq, op_der);
-            }
-            //EXP menos EXP
-            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '-' && this.soyNodo('EXP', nodo.hijos[2])){
-              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
-              return new Resta(nodo.linea, op_izq, op_der);
-            }
-            //EXP por EXP
-            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '*' && this.soyNodo('EXP', nodo.hijos[2])){
-              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
-              return new Multiplicacion(nodo.linea, op_izq, op_der);
-            }
-            //EXP div EXP
-            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '/' && this.soyNodo('EXP', nodo.hijos[2])){
-              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
-              return new Division(nodo.linea, op_izq, op_der);
-            }
-            //EXP mod EXP
-            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '%' && this.soyNodo('EXP', nodo.hijos[2])){
-              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
-              return new Modular(nodo.linea, op_izq, op_der);
-            }
-            //EXP potencia EXP
-            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '**' && this.soyNodo('EXP', nodo.hijos[2])){
-              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
-              return new Potencia(nodo.linea, op_izq, op_der);
-            }
-            /*****************************
-             * OPERACIONES RELACIONALES
-             *****************************/
-            //EXP mayor EXP
-            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '>' && this.soyNodo('EXP', nodo.hijos[2])){
-              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
-              return new MayorQue(nodo.linea, op_izq, op_der);
-            }
-            //EXP mayor_igual EXP
-            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '>=' && this.soyNodo('EXP', nodo.hijos[2])){
-              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
-              return new MayorIgualQue(nodo.linea, op_izq, op_der);
-            }
-            //EXP menor EXP
-            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '<' && this.soyNodo('EXP', nodo.hijos[2])){
-              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
-              return new MenorQue(nodo.linea, op_izq, op_der);
-            }
-            //EXP menor_igual EXP
-            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '<=' && this.soyNodo('EXP', nodo.hijos[2])){
-              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
-              return new MenorIgualQue(nodo.linea, op_izq, op_der);
-            }
-            //EXP igual_que EXP
-            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '==' && this.soyNodo('EXP', nodo.hijos[2])){
-              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
-              return new IgualQue(nodo.linea, op_izq, op_der);
-            }
-            /*****************************
-             * OPERACIONES LOGICAS
-             *****************************/
-            //EXP and EXP
-            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '&&' && this.soyNodo('EXP', nodo.hijos[2])){
-              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
-              return new And(nodo.linea, op_izq, op_der);
-            }
-            //EXP or EXP
-            if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '||' && this.soyNodo('EXP', nodo.hijos[2])){
-              const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-              const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
-              return new Or(nodo.linea, op_izq, op_der);
-            }
+          //id mas_mas
+          if(nodo.hijos[1] == '++'){
+            const id = nodo.hijos[0];
+            return new Incremento(nodo.linea, id);
+          }
+          //id menos_menos
+          if(nodo.hijos[1] == '--'){
+            const id = nodo.hijos[0];
+            return new Decremento(nodo.linea, id);
+          }
+          /*****************************
+           * OPERACIONES LOGICAS
+           *****************************/
+          //not EXP
+          if(nodo.hijos[0] == '!' && this.soyNodo('EXP',nodo.hijos[1])){
+            const exp : NodoAST = this.recorrer(nodo.hijos[1]);
+            return new Not(nodo.linea, exp);
+          }
+        case 3:
+          /*****************************
+           * OPERACIONES ARITMENTICAS
+           *****************************/
+          //EXP mas EXP
+          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '+' && this.soyNodo('EXP', nodo.hijos[2])){
+            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+            return new Suma(nodo.linea, op_izq, op_der);
+          }
+          //EXP menos EXP
+          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '-' && this.soyNodo('EXP', nodo.hijos[2])){
+            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+            return new Resta(nodo.linea, op_izq, op_der);
+          }
+          //EXP por EXP
+          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '*' && this.soyNodo('EXP', nodo.hijos[2])){
+            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+            return new Multiplicacion(nodo.linea, op_izq, op_der);
+          }
+          //EXP div EXP
+          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '/' && this.soyNodo('EXP', nodo.hijos[2])){
+            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+            return new Division(nodo.linea, op_izq, op_der);
+          }
+          //EXP mod EXP
+          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '%' && this.soyNodo('EXP', nodo.hijos[2])){
+            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+            return new Modular(nodo.linea, op_izq, op_der);
+          }
+          //EXP potencia EXP
+          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '**' && this.soyNodo('EXP', nodo.hijos[2])){
+            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+            return new Potencia(nodo.linea, op_izq, op_der);
+          }
+          /*****************************
+           * OPERACIONES RELACIONALES
+           *****************************/
+          //EXP mayor EXP
+          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '>' && this.soyNodo('EXP', nodo.hijos[2])){
+            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+            return new MayorQue(nodo.linea, op_izq, op_der);
+          }
+          //EXP mayor_igual EXP
+          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '>=' && this.soyNodo('EXP', nodo.hijos[2])){
+            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+            return new MayorIgualQue(nodo.linea, op_izq, op_der);
+          }
+          //EXP menor EXP
+          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '<' && this.soyNodo('EXP', nodo.hijos[2])){
+            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+            return new MenorQue(nodo.linea, op_izq, op_der);
+          }
+          //EXP menor_igual EXP
+          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '<=' && this.soyNodo('EXP', nodo.hijos[2])){
+            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+            return new MenorIgualQue(nodo.linea, op_izq, op_der);
+          }
+          //EXP igual_que EXP
+          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '==' && this.soyNodo('EXP', nodo.hijos[2])){
+            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+            return new IgualQue(nodo.linea, op_izq, op_der);
+          }
+          /*****************************
+           * OPERACIONES LOGICAS
+           *****************************/
+          //EXP and EXP
+          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '&&' && this.soyNodo('EXP', nodo.hijos[2])){
+            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+            return new And(nodo.linea, op_izq, op_der);
+          }
+          //EXP or EXP
+          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '||' && this.soyNodo('EXP', nodo.hijos[2])){
+            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+            return new Or(nodo.linea, op_izq, op_der);
+          }
       }
     }
 
@@ -782,6 +795,40 @@ export class Traduccion {
       const condicion = this.recorrer(nodo.hijos[2]);
       const instrucciones = this.recorrer(nodo.hijos[5]);
       return new While(nodo.linea, condicion, instrucciones);
+    }
+
+    //DO_WHILE
+    else if(this.soyNodo('DO_WHILE', nodo)){
+      //do llave_izq INSTRUCCIONES llave_der while par_izq EXP par_der punto_coma
+      const instrucciones = this.recorrer(nodo.hijos[2]);
+      const condicion = this.recorrer(nodo.hijos[6]);
+      return new DoWhile(nodo.linea, condicion, instrucciones);
+    }
+
+    //INCREMENTO_DECREMENTO
+    else if(this.soyNodo('INCREMENTO_DECREMENTO', nodo)){
+      const id = nodo.hijos[0];
+
+      //id mas_mas punto_coma
+      if(nodo.hijos[1] == '++'){
+        return new Incremento(nodo.linea, id, true);
+      }
+      //id menos_menos punto_coma
+      if(nodo.hijos[1] == '--'){
+        return new Decremento(nodo.linea, id, true);
+      }
+    }
+
+    //FOR
+    else if(this.soyNodo('FOR', nodo)){
+      //for par_izq DECLARACION_VARIABLE EXP punto_coma ASIGNACION_FOR par_der llave_izq INSTRUCCIONES llave_der
+      if(this.soyNodo('DECLARACION_VARIABLE', nodo.hijos[2])){
+
+      }
+      //for par_izq ASIGNACION EXP punto_coma ASIGNACION_FOR par_der llave_izq INSTRUCCIONES llave_der
+      if(this.soyNodo('ASIGNACION', nodo.hijos[2])){
+
+      }
     }
   }
 

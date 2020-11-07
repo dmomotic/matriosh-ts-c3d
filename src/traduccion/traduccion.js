@@ -45,6 +45,9 @@ const to_upper_case_1 = require("./expresiones/cadenas/to_upper_case");
 const to_lower_case_1 = require("./expresiones/cadenas/to_lower_case");
 const concat_1 = require("./expresiones/cadenas/concat");
 const while_1 = require("./instrucciones/ciclos/while");
+const incremento_1 = require("./expresiones/aritmeticas/incremento");
+const decremento_1 = require("./expresiones/aritmeticas/decremento");
+const do_while_1 = require("./instrucciones/ciclos/do_while");
 class Traduccion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
@@ -256,6 +259,16 @@ class Traduccion {
                     if (nodo.hijos[0] == '-' && this.soyNodo('EXP', nodo.hijos[1])) {
                         const exp = this.recorrer(nodo.hijos[1]);
                         return new umenos_1.UMenos(nodo.linea, exp);
+                    }
+                    //id mas_mas
+                    if (nodo.hijos[1] == '++') {
+                        const id = nodo.hijos[0];
+                        return new incremento_1.Incremento(nodo.linea, id);
+                    }
+                    //id menos_menos
+                    if (nodo.hijos[1] == '--') {
+                        const id = nodo.hijos[0];
+                        return new decremento_1.Decremento(nodo.linea, id);
                     }
                     /*****************************
                      * OPERACIONES LOGICAS
@@ -729,6 +742,34 @@ class Traduccion {
             const condicion = this.recorrer(nodo.hijos[2]);
             const instrucciones = this.recorrer(nodo.hijos[5]);
             return new while_1.While(nodo.linea, condicion, instrucciones);
+        }
+        //DO_WHILE
+        else if (this.soyNodo('DO_WHILE', nodo)) {
+            //do llave_izq INSTRUCCIONES llave_der while par_izq EXP par_der punto_coma
+            const instrucciones = this.recorrer(nodo.hijos[2]);
+            const condicion = this.recorrer(nodo.hijos[6]);
+            return new do_while_1.DoWhile(nodo.linea, condicion, instrucciones);
+        }
+        //INCREMENTO_DECREMENTO
+        else if (this.soyNodo('INCREMENTO_DECREMENTO', nodo)) {
+            const id = nodo.hijos[0];
+            //id mas_mas punto_coma
+            if (nodo.hijos[1] == '++') {
+                return new incremento_1.Incremento(nodo.linea, id, true);
+            }
+            //id menos_menos punto_coma
+            if (nodo.hijos[1] == '--') {
+                return new decremento_1.Decremento(nodo.linea, id, true);
+            }
+        }
+        //FOR
+        else if (this.soyNodo('FOR', nodo)) {
+            //for par_izq DECLARACION_VARIABLE EXP punto_coma ASIGNACION_FOR par_der llave_izq INSTRUCCIONES llave_der
+            if (this.soyNodo('DECLARACION_VARIABLE', nodo.hijos[2])) {
+            }
+            //for par_izq ASIGNACION EXP punto_coma ASIGNACION_FOR par_der llave_izq INSTRUCCIONES llave_der
+            if (this.soyNodo('ASIGNACION', nodo.hijos[2])) {
+            }
         }
     }
     /**
