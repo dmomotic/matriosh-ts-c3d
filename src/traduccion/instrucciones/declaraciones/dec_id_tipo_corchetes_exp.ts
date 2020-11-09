@@ -99,6 +99,7 @@ export class DecIdTipoCorchetesExp extends NodoAST {
       }
 
       variable = new Variable({ id: this.id, tipo: TIPO_DATO.ARRAY, reasignable: this.reasignable, posicion: pos, inicializado: true, tamaño: this.dimensiones, global: true, tipo_de_arreglo: this.tipo, referencia: this.type_generador });
+
       ts.setVariable(variable);
     }
     //Si no es una declaracion global

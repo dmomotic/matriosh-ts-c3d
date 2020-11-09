@@ -65,7 +65,17 @@ class Length extends nodoAST_1.NodoAST {
                 }
                 //Si es tipo ARRAY
                 else if (tipos_1.isTipoArray(variable.tipo)) {
-                    //TODO: implementar
+                    const aux_pos = temporal_1.Temporal.getSiguiente();
+                    codigo3D_1.Codigo3D.add(`${aux_pos} = ${variable.posicion};`);
+                    const pos = temporal_1.Temporal.getSiguiente();
+                    codigo3D_1.Codigo3D.add(`${pos} = Heap[(int)${aux_pos}];`);
+                    const pos_tam = temporal_1.Temporal.getSiguiente();
+                    codigo3D_1.Codigo3D.add(`${pos_tam} = ${pos} - 1;`);
+                    const tamaño = temporal_1.Temporal.getSiguiente();
+                    codigo3D_1.Codigo3D.add(`${tamaño} = Heap[(int)${pos_tam}];`);
+                    //GUARDO EL TEMPORAL
+                    control_funcion_1.ControlFuncion.guardarTemporal(tamaño);
+                    return new control_1.Control({ temporal: tamaño, tipo: 6 /* INT */ });
                 }
             }
             //Si es una variable local

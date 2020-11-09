@@ -51,6 +51,8 @@ import { For } from './instrucciones/ciclos/for';
 import { DecIdTipo } from './instrucciones/declaraciones/dec_id_tipo';
 import { Arreglo } from './expresiones/arreglo';
 import { DecIdTipoCorchetesExp } from './instrucciones/declaraciones/dec_id_tipo_corchetes_exp';
+import { AccesoArreglo } from './expresiones/acceso_arreglo';
+import { AsignacionArreglo } from './instrucciones/asignaciones/asignacion_arreglo';
 
 export class Traduccion {
   raiz: Object;
@@ -681,8 +683,15 @@ export class Traduccion {
     else if (this.soyNodo('ASIGNACION', nodo)) {
       switch (nodo.hijos.length) {
         case 4:
+          //ACCESO_ARREGLO TIPO_IGUAL EXP punto_coma
+          if(this.soyNodo('ACCESO_ARREGLO', nodo.hijos[0])){
+            const acceso = this.recorrer(nodo.hijos[0]);
+            const tipo_igual = this.recorrer(nodo.hijos[1]);
+            const exp = this.recorrer(nodo.hijos[2]);
+            return new AsignacionArreglo(nodo.linea, acceso, tipo_igual, exp);
+          }
           //id TIPO_IGUAL EXP punto_coma
-          if (this.soyNodo('TIPO_IGUAL', nodo.hijos[1]) && this.soyNodo('EXP', nodo.hijos[2])) {
+          else if (this.soyNodo('TIPO_IGUAL', nodo.hijos[1]) && this.soyNodo('EXP', nodo.hijos[2])) {
             const id = nodo.hijos[0];
             const tipo_igual = this.recorrer(nodo.hijos[1]);
             const exp = this.recorrer(nodo.hijos[2]);
@@ -913,7 +922,7 @@ export class Traduccion {
       //id LISTA_ACCESOS_ARREGLO
       const id = nodo.hijos[0];
       const lista_exps = this.recorrer(nodo.hijos[1]);
-
+      return new AccesoArreglo(nodo.linea, id, lista_exps);
     }
   }
 

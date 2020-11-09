@@ -481,7 +481,7 @@ TERNARIO
   : EXP interrogacion EXP dos_puntos EXP { $$ = new NodoAST({label: 'TERNARIO', hijos: [$1,$2,$3,$4,$5], linea: yylineno}); }
 ;
 
-ACCESO_ARREGLO
+ACCESO_ARREGLO /**--> YA <--**/ /* 1 dimension */
   : id LISTA_ACCESOS_ARREGLO { $$ = new NodoAST({label: 'ACCESO_ARREGLO', hijos: [$1, $2], linea: yylineno}); }
 ;
 

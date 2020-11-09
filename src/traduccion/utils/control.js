@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Control = void 0;
 class Control {
-    constructor({ temporal = null, tipo = null, referencia = null, verdaderas = [], falsas = [], tipo_de_arreglo = null }) {
-        Object.assign(this, { temporal, tipo, referencia, verdaderas, falsas, tipo_de_arreglo });
+    constructor({ temporal = null, tipo = null, referencia = null, verdaderas = [], falsas = [], tipo_de_arreglo = null, posicion = null }) {
+        Object.assign(this, { temporal, tipo, referencia, verdaderas, falsas, tipo_de_arreglo, posicion });
     }
     hasTemporal() {
         return this.temporal != null && this.temporal.trim().length > 0;
@@ -16,6 +16,9 @@ class Control {
     }
     deboAsignarValorPorDefectoAlArray() {
         return this.tipo == 4 /* ARRAY */ && this.tipo_de_arreglo == null;
+    }
+    hasPosicion() {
+        return this.posicion != null;
     }
 }
 exports.Control = Control;
