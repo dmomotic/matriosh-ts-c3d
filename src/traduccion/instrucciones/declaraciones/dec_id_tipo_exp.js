@@ -25,7 +25,7 @@ class DecIdTipoExp extends nodoAST_1.NodoAST {
         let variable = ts.getVariable(this.id);
         //Si la variable ya existe es un error
         if (variable) {
-            errores_1.Errores.push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `No existe ninguna variable con el id: ${this.id} en este ambito` }));
+            errores_1.Errores.push(new error_1.Error({ tipo: 'semantico', linea: this.linea, descripcion: `Ya existe una variable con el id: ${this.id} en este ambito` }));
             return;
         }
         //Obtengo objeto de tipo Control para mi expresion

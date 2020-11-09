@@ -6,9 +6,10 @@ export class Control{
   referencia: string;
   verdaderas: string[];
   falsas: string[];
+  tipo_de_arreglo: TIPO_DATO;
 
-  constructor({temporal = null, tipo = null, referencia = null, verdaderas = [], falsas = []}: {temporal?: string, tipo?: TIPO_DATO, referencia?: string, verdaderas?: string[], falsas?: string[]}){
-    Object.assign(this, {temporal, tipo, referencia, verdaderas, falsas});
+  constructor({temporal = null, tipo = null, referencia = null, verdaderas = [], falsas = [], tipo_de_arreglo = null}: {temporal?: string, tipo?: TIPO_DATO, referencia?: string, verdaderas?: string[], falsas?: string[], tipo_de_arreglo?: TIPO_DATO}){
+    Object.assign(this, {temporal, tipo, referencia, verdaderas, falsas, tipo_de_arreglo});
   }
 
   hasTemporal(): boolean{
@@ -21,5 +22,9 @@ export class Control{
 
   hasReferencia(): boolean{
     return this.referencia != null;
+  }
+
+  deboAsignarValorPorDefectoAlArray(): boolean {
+    return this.tipo == TIPO_DATO.ARRAY && this.tipo_de_arreglo == null;
   }
 }

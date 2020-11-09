@@ -45,6 +45,7 @@
 'ToLowerCase' return 'toLowerCase';
 'ToUpperCase' return 'toUpperCase';
 'concat' return 'concat';
+'new' return 'new';
 
 //Signos
 ';' return 'punto_coma';
@@ -177,7 +178,7 @@ DO_WHILE /**--> YA <--**/
   : do llave_izq INSTRUCCIONES llave_der while par_izq EXP par_der punto_coma { $$ = new NodoAST({label: 'DO_WHILE', hijos: [$1,$2,$3,$4,$5,$6,$7,$8,$9], linea: yylineno}); }
 ;
 
-FOR
+FOR /**--> YA <--**/
   : for par_izq DECLARACION_VARIABLE EXP punto_coma ASIGNACION_FOR par_der llave_izq INSTRUCCIONES llave_der { $$ = new NodoAST({label: 'FOR', hijos: [$1,$2,$3,$4,$5,$6,$7,$8,$9,$10], linea: yylineno}); }
   | for par_izq ASIGNACION EXP punto_coma ASIGNACION_FOR par_der llave_izq INSTRUCCIONES llave_der { $$ = new NodoAST({label: 'FOR', hijos: [$1,$2,$3,$4,$5,$6,$7,$8,$9,$10], linea: yylineno}); }
 ;
@@ -207,7 +208,7 @@ TIPO_IGUAL /**--> YA <--**/
   | menos igual { $$ = new NodoAST({label: 'TIPO_IGUAL', hijos: [$1,$2], linea: yylineno}); }
 ;
 
-ASIGNACION_FOR
+ASIGNACION_FOR /**--> YA <--**/
   : id TIPO_IGUAL EXP { $$ = new NodoAST({label: 'ASIGNACION_FOR', hijos: [$1,$2,$3], linea: yylineno}); }
   | id mas_mas { $$ = new NodoAST({label: 'ASIGNACION_FOR', hijos: [$1,$2], linea: yylineno}); }
   | id menos_menos { $$ = new NodoAST({label: 'ASIGNACION_FOR', hijos: [$1,$2], linea: yylineno}); }
@@ -334,7 +335,7 @@ LISTA_DECLARACIONES
   | LISTA_DECLARACIONES coma DEC_ID_EXP { $$ = new NodoAST({label: 'LISTA_DECLARACIONES', hijos: [...$1.hijos,$3], linea: yylineno}); }
   | LISTA_DECLARACIONES coma DEC_ID_TIPO_EXP { $$ = new NodoAST({label: 'LISTA_DECLARACIONES', hijos: [...$1.hijos,$3], linea: yylineno}); }
   | LISTA_DECLARACIONES coma DEC_ID_TIPO_CORCHETES_EXP { $$ = new NodoAST({label: 'LISTA_DECLARACIONES', hijos: [...$1.hijos,$3], linea: yylineno}); }
-  | DEC_ID_TIPO { $$ = new NodoAST({label: 'LISTA_DECLARACIONES', hijos: [$1], linea: yylineno}); }
+  | DEC_ID_TIPO /**--> YA <--**/ { $$ = new NodoAST({label: 'LISTA_DECLARACIONES', hijos: [$1], linea: yylineno}); }
   | DEC_ID_TIPO_CORCHETES { $$ = new NodoAST({label: 'LISTA_DECLARACIONES', hijos: [$1], linea: yylineno}); }
   | DEC_ID_TIPO_EXP /**--> YA <--**/ { $$ = new NodoAST({label: 'LISTA_DECLARACIONES', hijos: [$1], linea: yylineno}); }
   | DEC_ID_TIPO_CORCHETES_EXP { $$ = new NodoAST({label: 'LISTA_DECLARACIONES', hijos: [$1], linea: yylineno}); }
@@ -346,7 +347,7 @@ DEC_ID_TIPO_CORCHETES_EXP
 ;
 
 //let id : TIPO_VARIABLE_NATIVA = EXP;
-DEC_ID_TIPO_EXP
+DEC_ID_TIPO_EXP /**--> YA <--**/
   : id dos_puntos TIPO_VARIABLE_NATIVA igual EXP { $$ = new NodoAST({label: 'DEC_ID_TIPO_EXP', hijos: [$1,$2,$3,$4,$5], linea: yylineno}); }
 ;
 
@@ -405,11 +406,8 @@ EXP
   | cor_izq cor_der { $$ = new NodoAST({label: 'EXP', hijos: [$1,$2], linea: yylineno}); }
   | ACCESO_ARREGLO { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
   | LENGTH { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
-  | CHAR_AT /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
-  | TO_LOWER_CASE /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
-  | TO_UPPER_CASE /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
-  | CONCAT { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
   | ARRAY_POP { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
+  | NEW_ARRAY { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
   //Types - accesos
   | ACCESO_TYPE { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
   | TYPE { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
@@ -417,6 +415,15 @@ EXP
   | TERNARIO { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
   //Funciones
   | LLAMADA_FUNCION_EXP { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
+  //Strings
+  | CHAR_AT /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
+  | TO_LOWER_CASE /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
+  | TO_UPPER_CASE /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
+  | CONCAT /**--> YA <--**/ { $$ = new NodoAST({label: 'EXP', hijos: [$1], linea: yylineno}); }
+;
+
+NEW_ARRAY /**--> YA <--**/
+  : new Array par_izq EXP par_der { $$ = new NodoAST({label: 'NEW_ARRAY', hijos: [$1,$2,$3,$4,$5], linea: yylineno}); }
 ;
 
 TYPE
@@ -489,12 +496,12 @@ LISTA_ACCESOS_TYPE
   | punto id LISTA_ACCESOS_ARREGLO { $$ = new NodoAST({label: 'LISTA_ACCESOS_TYPE', hijos: [$1,$2,$3], linea: yylineno}); }
 ;
 
-LISTA_ACCESOS_ARREGLO
+LISTA_ACCESOS_ARREGLO /**--> YA <--**/
   : LISTA_ACCESOS_ARREGLO cor_izq EXP cor_der { $$ = new NodoAST({label: 'LISTA_ACCESOS_ARREGLO', hijos: [...$1.hijos,$2,$3,$4], linea: yylineno}); }
   | cor_izq EXP cor_der { $$ = new NodoAST({label: 'LISTA_ACCESOS_ARREGLO', hijos: [$1,$2,$3], linea: yylineno}); }
 ;
 
-LISTA_EXPRESIONES
+LISTA_EXPRESIONES /**--> YA <--**/
   : LISTA_EXPRESIONES coma EXP { $$ = new NodoAST({label: 'LISTA_EXPRESIONES', hijos: [...$1.hijos,$2,$3], linea: yylineno}); }
   | EXP { $$ = new NodoAST({label: 'LISTA_EXPRESIONES', hijos: [$1], linea: yylineno}); }
 ;

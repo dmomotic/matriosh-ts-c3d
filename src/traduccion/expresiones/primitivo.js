@@ -40,6 +40,30 @@ class Primitivo extends nodoAST_1.NodoAST {
                         codigo3D_1.Codigo3D.add(`H = H + 1;`);
                         i++;
                     }
+                    //Si es comilla doble
+                    else if (this.valor.charAt(i) == '\\' && i + 1 < this.valor.length && this.valor.charAt(i + 1) == '"') {
+                        codigo3D_1.Codigo3D.add(`Heap[(int)H] = ${34};`);
+                        codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                        i++;
+                    }
+                    // Si es una barra invertida
+                    else if (this.valor.charAt(i) == '\\' && i + 1 < this.valor.length && this.valor.charAt(i + 1) == '\\') {
+                        codigo3D_1.Codigo3D.add(`Heap[(int)H] = ${92};`);
+                        codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                        i++;
+                    }
+                    // Si es un retorno de carro
+                    else if (this.valor.charAt(i) == '\\' && i + 1 < this.valor.length && this.valor.charAt(i + 1) == 'r') {
+                        codigo3D_1.Codigo3D.add(`Heap[(int)H] = ${13};`);
+                        codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                        i++;
+                    }
+                    //Si es una tabulacion
+                    else if (this.valor.charAt(i) == '\\' && i + 1 < this.valor.length && this.valor.charAt(i + 1) == 't') {
+                        codigo3D_1.Codigo3D.add(`Heap[(int)H] = ${9};`);
+                        codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                        i++;
+                    }
                     else {
                         let ascii = this.valor.charCodeAt(i);
                         codigo3D_1.Codigo3D.add(`Heap[(int)H] = ${ascii};`);

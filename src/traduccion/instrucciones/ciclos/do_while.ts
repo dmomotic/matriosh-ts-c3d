@@ -4,7 +4,6 @@ import { Codigo3D } from "../../generales/codigo3D";
 import { Etiqueta } from "../../generales/etiqueta";
 import { NodoAST } from "../../generales/nodoAST";
 import { TablaSimbolos } from "../../generales/tablaSimbolos";
-import { Temporal } from "../../generales/temporal";
 import { isTipoBoolean } from "../../generales/tipos";
 import { Control } from "../../utils/control";
 import { ControlFuncion } from "../../utils/control_funcion";

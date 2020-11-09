@@ -47,6 +47,10 @@ import { While } from './instrucciones/ciclos/while';
 import { Incremento } from './expresiones/aritmeticas/incremento';
 import { Decremento } from './expresiones/aritmeticas/decremento';
 import { DoWhile } from './instrucciones/ciclos/do_while';
+import { For } from './instrucciones/ciclos/for';
+import { DecIdTipo } from './instrucciones/declaraciones/dec_id_tipo';
+import { Arreglo } from './expresiones/arreglo';
+import { DecIdTipoCorchetesExp } from './instrucciones/declaraciones/dec_id_tipo_corchetes_exp';
 
 export class Traduccion {
   raiz: Object;
@@ -66,8 +70,8 @@ export class Traduccion {
     Codigo3D.clear();
     let instrucciones = this.recorrer(this.raiz);
     const ts_global = new TablaSimbolos();
-    instrucciones.forEach((instruccion : any) => {
-      if(instruccion instanceof NodoAST){
+    instrucciones.forEach((instruccion: any) => {
+      if (instruccion instanceof NodoAST) {
         instruccion.traducir(ts_global);
       }
     });
@@ -91,28 +95,28 @@ export class Traduccion {
     encabezado += 'double H;\n';
     const ultimo: number = Temporal.getIndex();
     let temporales = '\n';
-    for(let i: number = 0; i < ultimo; i++){
-      if(i == 0){
+    for (let i: number = 0; i < ultimo; i++) {
+      if (i == 0) {
         temporales += 'double ';
       }
-      temporales += 't'+i;
+      temporales += 't' + i;
       //Si es el ultimo
-      if(i == ultimo - 1){
+      if (i == ultimo - 1) {
         temporales += ';\n'
       }
       //Si no es el ultimo
-      else{
+      else {
         temporales += ', '
       }
     }
     Codigo3D.addInit(encabezado + temporales);
   }
 
-  reservarGlobalesEnHeap() : void{
+  reservarGlobalesEnHeap(): void {
     const ultimo = Heap.getIndex();
 
     let c3d = '/***** Reserva de memoria para variables globales ******/\n';
-    for(let i : number = 0; i < ultimo; i++){
+    for (let i: number = 0; i < ultimo; i++) {
       c3d += 'H = H + 1;\n';
     }
     Codigo3D.addInit(c3d);
@@ -165,9 +169,9 @@ export class Traduccion {
       nodo.hijos.forEach((nodoHijo: any) => {
         if (nodoHijo instanceof Object) {
           const res = this.recorrer(nodoHijo);
-          if(res instanceof Array){
+          if (res instanceof Array) {
             instrucciones = instrucciones.concat(res);
-          }else{
+          } else {
             instrucciones.push(res);
           }
         }
@@ -185,21 +189,29 @@ export class Traduccion {
     else if (this.soyNodo('DECLARACION_VARIABLE', nodo)) {
       //TIPO_DEC_VARIABLE LISTA_DECLARACIONES punto_coma
       const reasignable = this.recorrer(nodo.hijos[0]) as boolean;
-      const lista_declaraciones = this.recorrer(nodo.hijos[1]) as Array<Object>;
-      const lista_instrucciones = [];
+      const lista_declaraciones : Object[]= this.recorrer(nodo.hijos[1]);
+      const lista_instrucciones : NodoAST[] = [];
       lista_declaraciones.forEach((item: Object) => {
         const linea = nodo.linea;
         const id = item['id'];
+        const tipo = item['tipo'];
+        //{ id, tipo, exp, type_generador?, dimensiones }
+        if (_.has(item, 'id') && _.has(item, 'tipo') && _.has(item, 'exp') && _.has(item, 'dimensiones')) {
+          const exp = item['exp'];
+          const type_generador = item['type_generador'] ?? null;
+          const dimensiones = item['dimensiones'];
+          lista_instrucciones.push(new DecIdTipoCorchetesExp(nodo.linea, reasignable, id, tipo, dimensiones, exp, type_generador));
+        }
         //{ id, tipo, exp, type_generador? }
-        if (_.has(item, 'id') && _.has(item, 'tipo') && _.has(item, 'exp')) {
-          const tipo = item['tipo'];
+        else if (_.has(item, 'id') && _.has(item, 'tipo') && _.has(item, 'exp')) {
           const exp = item['exp'];
           const type_generador = item['type_generador'] ?? null;
           lista_instrucciones.push(new DecIdTipoExp(nodo.linea, reasignable, id, tipo, exp, type_generador));
         }
         //{id, tipo, type_generador? }
         else if (_.has(item, 'id') && _.has(item, 'tipo')) {
-
+          const type_generador = item['type_generador'] ?? null;
+          lista_instrucciones.push(new DecIdTipo(nodo.linea, reasignable, id, tipo, type_generador));
         }
       })
       return lista_instrucciones;
@@ -226,12 +238,28 @@ export class Traduccion {
     }
 
     //DEC_ID_TIPO_EXP  ---->  { id, tipo, exp, type_generador? }
-    else if(this.soyNodo('DEC_ID_TIPO_EXP', nodo)) {
+    else if (this.soyNodo('DEC_ID_TIPO_EXP', nodo)) {
       //id dos_puntos TIPO_VARIABLE_NATIVA igual EXP
       const id = nodo.hijos[0];
       const tipo = this.recorrer(nodo.hijos[2]);
       const exp = this.recorrer(nodo.hijos[4]);
-      return {id, ...tipo, exp};
+      return { id, ...tipo, exp };
+    }
+
+    //DEC_ID_TIPO_CORCHETES_EXP  ---->  { id, tipo, exp, type_generador?, dimensiones }
+    else if(this.soyNodo('DEC_ID_TIPO_CORCHETES_EXP', nodo)){
+      //id dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES igual EXP
+      const id = nodo.hijos[0];
+      const tipo = this.recorrer(nodo.hijos[2]);
+      const dimensiones = this.recorrer(nodo.hijos[3]);
+      const exp = this.recorrer(nodo.hijos[5]);
+      return { id, ...tipo, dimensiones, exp};
+    }
+
+    //LISTA_CORCHETES  ---->  int
+    else if(this.soyNodo('LISTA_CORCHETES', nodo)){
+      const dimensiones = nodo.hijos.length;
+      return dimensiones;
     }
 
     //TIPO_VARIABLE_NATIVA  ---->  { tipo, type_generador? }
@@ -267,23 +295,23 @@ export class Traduccion {
 
             //Si es un objeto
             if (exp instanceof Object) return exp;
-        }
+          }
         case 2:
           /*****************************
            * OPERACIONES ARITMENTICAS
            *****************************/
           //menos EXP
-          if(nodo.hijos[0] == '-' && this.soyNodo('EXP',nodo.hijos[1])){
-            const exp : NodoAST = this.recorrer(nodo.hijos[1]);
+          if (nodo.hijos[0] == '-' && this.soyNodo('EXP', nodo.hijos[1])) {
+            const exp: NodoAST = this.recorrer(nodo.hijos[1]);
             return new UMenos(nodo.linea, exp);
           }
           //id mas_mas
-          if(nodo.hijos[1] == '++'){
+          if (nodo.hijos[1] == '++') {
             const id = nodo.hijos[0];
             return new Incremento(nodo.linea, id);
           }
           //id menos_menos
-          if(nodo.hijos[1] == '--'){
+          if (nodo.hijos[1] == '--') {
             const id = nodo.hijos[0];
             return new Decremento(nodo.linea, id);
           }
@@ -291,8 +319,8 @@ export class Traduccion {
            * OPERACIONES LOGICAS
            *****************************/
           //not EXP
-          if(nodo.hijos[0] == '!' && this.soyNodo('EXP',nodo.hijos[1])){
-            const exp : NodoAST = this.recorrer(nodo.hijos[1]);
+          if (nodo.hijos[0] == '!' && this.soyNodo('EXP', nodo.hijos[1])) {
+            const exp: NodoAST = this.recorrer(nodo.hijos[1]);
             return new Not(nodo.linea, exp);
           }
         case 3:
@@ -300,87 +328,87 @@ export class Traduccion {
            * OPERACIONES ARITMENTICAS
            *****************************/
           //EXP mas EXP
-          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '+' && this.soyNodo('EXP', nodo.hijos[2])){
-            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '+' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const op_izq: NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der: NodoAST = this.recorrer(nodo.hijos[2]);
             return new Suma(nodo.linea, op_izq, op_der);
           }
           //EXP menos EXP
-          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '-' && this.soyNodo('EXP', nodo.hijos[2])){
-            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '-' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const op_izq: NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der: NodoAST = this.recorrer(nodo.hijos[2]);
             return new Resta(nodo.linea, op_izq, op_der);
           }
           //EXP por EXP
-          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '*' && this.soyNodo('EXP', nodo.hijos[2])){
-            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '*' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const op_izq: NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der: NodoAST = this.recorrer(nodo.hijos[2]);
             return new Multiplicacion(nodo.linea, op_izq, op_der);
           }
           //EXP div EXP
-          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '/' && this.soyNodo('EXP', nodo.hijos[2])){
-            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '/' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const op_izq: NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der: NodoAST = this.recorrer(nodo.hijos[2]);
             return new Division(nodo.linea, op_izq, op_der);
           }
           //EXP mod EXP
-          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '%' && this.soyNodo('EXP', nodo.hijos[2])){
-            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '%' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const op_izq: NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der: NodoAST = this.recorrer(nodo.hijos[2]);
             return new Modular(nodo.linea, op_izq, op_der);
           }
           //EXP potencia EXP
-          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '**' && this.soyNodo('EXP', nodo.hijos[2])){
-            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '**' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const op_izq: NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der: NodoAST = this.recorrer(nodo.hijos[2]);
             return new Potencia(nodo.linea, op_izq, op_der);
           }
           /*****************************
            * OPERACIONES RELACIONALES
            *****************************/
           //EXP mayor EXP
-          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '>' && this.soyNodo('EXP', nodo.hijos[2])){
-            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '>' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const op_izq: NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der: NodoAST = this.recorrer(nodo.hijos[2]);
             return new MayorQue(nodo.linea, op_izq, op_der);
           }
           //EXP mayor_igual EXP
-          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '>=' && this.soyNodo('EXP', nodo.hijos[2])){
-            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '>=' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const op_izq: NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der: NodoAST = this.recorrer(nodo.hijos[2]);
             return new MayorIgualQue(nodo.linea, op_izq, op_der);
           }
           //EXP menor EXP
-          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '<' && this.soyNodo('EXP', nodo.hijos[2])){
-            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '<' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const op_izq: NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der: NodoAST = this.recorrer(nodo.hijos[2]);
             return new MenorQue(nodo.linea, op_izq, op_der);
           }
           //EXP menor_igual EXP
-          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '<=' && this.soyNodo('EXP', nodo.hijos[2])){
-            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '<=' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const op_izq: NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der: NodoAST = this.recorrer(nodo.hijos[2]);
             return new MenorIgualQue(nodo.linea, op_izq, op_der);
           }
           //EXP igual_que EXP
-          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '==' && this.soyNodo('EXP', nodo.hijos[2])){
-            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '==' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const op_izq: NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der: NodoAST = this.recorrer(nodo.hijos[2]);
             return new IgualQue(nodo.linea, op_izq, op_der);
           }
           /*****************************
            * OPERACIONES LOGICAS
            *****************************/
           //EXP and EXP
-          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '&&' && this.soyNodo('EXP', nodo.hijos[2])){
-            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '&&' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const op_izq: NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der: NodoAST = this.recorrer(nodo.hijos[2]);
             return new And(nodo.linea, op_izq, op_der);
           }
           //EXP or EXP
-          if(this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '||' && this.soyNodo('EXP', nodo.hijos[2])){
-            const op_izq : NodoAST = this.recorrer(nodo.hijos[0]);
-            const op_der : NodoAST = this.recorrer(nodo.hijos[2]);
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '||' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const op_izq: NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der: NodoAST = this.recorrer(nodo.hijos[2]);
             return new Or(nodo.linea, op_izq, op_der);
           }
       }
@@ -412,20 +440,20 @@ export class Traduccion {
     }
 
     //CONSOLE_LOG
-    else if(this.soyNodo('CONSOLE_LOG', nodo)){
+    else if (this.soyNodo('CONSOLE_LOG', nodo)) {
       //console punto log par_izq LISTA_EXPRESIONES par_der punto_coma
       const exps = this.recorrer(nodo.hijos[4]);
       return new ConsoleLog(nodo.linea, exps);
     }
 
     //LISTA_EXPRESIONES  ---->  [exp...]
-    else if(this.soyNodo('LISTA_EXPRESIONES', nodo)){
-      const exps: Array<NodoAST> = [];
+    else if (this.soyNodo('LISTA_EXPRESIONES', nodo)) {
+      const exps: NodoAST[] = [];
       nodo.hijos.forEach((hijo: any) => {
-        if(hijo instanceof Object){
+        if (hijo instanceof Object) {
           const resp = this.recorrer(hijo);
           //Si es una respuesta valida
-          if(resp){
+          if (resp) {
             exps.push(resp);
           }
         }
@@ -434,66 +462,66 @@ export class Traduccion {
     }
 
     //INSTRUCCION_IF  ---->  InstruccionIf(nodo.linea, [If])
-    else if(this.soyNodo('INSTRUCCION_IF', nodo)){
-      switch(nodo.hijos.length){
+    else if (this.soyNodo('INSTRUCCION_IF', nodo)) {
+      switch (nodo.hijos.length) {
         //IF
         case 1: {
-          const inst_if : If = this.recorrer(nodo.hijos[0]);
+          const inst_if: If = this.recorrer(nodo.hijos[0]);
           return new InstruccionIf(nodo.linea, [inst_if]);
         }
         case 2:
           //IF ELSE
-          if(this.soyNodo('IF',nodo.hijos[0]) && this.soyNodo('ELSE', nodo.hijos[1])){
-            const inst_if : If = this.recorrer(nodo.hijos[0]);
-            const inst_else : If = this.recorrer(nodo.hijos[1]);
+          if (this.soyNodo('IF', nodo.hijos[0]) && this.soyNodo('ELSE', nodo.hijos[1])) {
+            const inst_if: If = this.recorrer(nodo.hijos[0]);
+            const inst_else: If = this.recorrer(nodo.hijos[1]);
             return new InstruccionIf(nodo.linea, [inst_if, inst_else]);
           }
           //IF LISTA_ELSE_IF
-          if(this.soyNodo('IF', nodo.hijos[0]) && this.soyNodo('LISTA_ELSE_IF', nodo.hijos[1])){
-            const inst_if : If = this.recorrer(nodo.hijos[0]);
-            const lista_ifs : If[] = this.recorrer(nodo.hijos[1]);
+          if (this.soyNodo('IF', nodo.hijos[0]) && this.soyNodo('LISTA_ELSE_IF', nodo.hijos[1])) {
+            const inst_if: If = this.recorrer(nodo.hijos[0]);
+            const lista_ifs: If[] = this.recorrer(nodo.hijos[1]);
             return new InstruccionIf(nodo.linea, [inst_if, ...lista_ifs]);
           }
         case 3:
           //IF LISTA_ELSE_IF ELSE
-          if(this.soyNodo('IF', nodo.hijos[0]) && this.soyNodo('LISTA_ELSE_IF', nodo.hijos[1]) && this.soyNodo('ELSE', nodo.hijos[2])){
-            const inst_if : If = this.recorrer(nodo.hijos[0]);
-            const lista_ifs : If[] = this.recorrer(nodo.hijos[1]);
-            const inst_else : If = this.recorrer(nodo.hijos[2]);
+          if (this.soyNodo('IF', nodo.hijos[0]) && this.soyNodo('LISTA_ELSE_IF', nodo.hijos[1]) && this.soyNodo('ELSE', nodo.hijos[2])) {
+            const inst_if: If = this.recorrer(nodo.hijos[0]);
+            const lista_ifs: If[] = this.recorrer(nodo.hijos[1]);
+            const inst_else: If = this.recorrer(nodo.hijos[2]);
             return new InstruccionIf(nodo.linea, [inst_if, ...lista_ifs, inst_else]);
           }
       }
     }
 
     //IF  ---->  If(condicion, instrucciones)
-    else if(this.soyNodo('IF', nodo)){
+    else if (this.soyNodo('IF', nodo)) {
       //if par_izq EXP par_der llave_izq INSTRUCCIONES llave_der
-      const condicion : NodoAST = this.recorrer(nodo.hijos[2]);
-      const instrucciones : NodoAST[] = this.recorrer(nodo.hijos[5]);
+      const condicion: NodoAST = this.recorrer(nodo.hijos[2]);
+      const instrucciones: NodoAST[] = this.recorrer(nodo.hijos[5]);
       return new If(condicion, instrucciones);
     }
 
     //ELSE_IF  ---->  If(condicion, instrucciones)
-    else if(this.soyNodo('ELSE_IF', nodo)){
+    else if (this.soyNodo('ELSE_IF', nodo)) {
       //else if par_izq EXP par_der llave_izq INSTRUCCIONES llave_der
-      const condicion : NodoAST = this.recorrer(nodo.hijos[3]);
-      const instrucciones : NodoAST[] = this.recorrer(nodo.hijos[6]);
+      const condicion: NodoAST = this.recorrer(nodo.hijos[3]);
+      const instrucciones: NodoAST[] = this.recorrer(nodo.hijos[6]);
       return new If(condicion, instrucciones);
     }
 
     //ELSE  ---->  If(null, instrucciones)
-    else if(this.soyNodo('ELSE', nodo)){
+    else if (this.soyNodo('ELSE', nodo)) {
       //else llave_izq INSTRUCCIONES llave_der
-      const instrucciones : NodoAST[] = this.recorrer(nodo.hijos[2]);
+      const instrucciones: NodoAST[] = this.recorrer(nodo.hijos[2]);
       return new If(null, instrucciones);
     }
 
     //LISTA_ELSE_IF  ---->  [ If(null, instrucciones) ]
-    else if(this.soyNodo('LISTA_ELSE_IF', nodo)){
-      const lista_ifs : If[] = [];
-      nodo.hijos.forEach((nodoHijo : any) => {
+    else if (this.soyNodo('LISTA_ELSE_IF', nodo)) {
+      const lista_ifs: If[] = [];
+      nodo.hijos.forEach((nodoHijo: any) => {
         const inst_if = this.recorrer(nodoHijo);
-        if(inst_if != null && inst_if instanceof If){
+        if (inst_if != null && inst_if instanceof If) {
           lista_ifs.push(inst_if);
         }
       });
@@ -501,12 +529,12 @@ export class Traduccion {
     }
 
     //DECLARACION_FUNCION  ---->  DecFuncion
-    else if(this.soyNodo('DECLARACION_FUNCION', nodo)){
+    else if (this.soyNodo('DECLARACION_FUNCION', nodo)) {
       const id = nodo.hijos[1];
 
-      switch(nodo.hijos.length){
+      switch (nodo.hijos.length) {
         //function id par_izq par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der
-        case 9:{
+        case 9: {
           //{ tipo, type_generador? }
           const tipo_funcion = this.recorrer(nodo.hijos[5]);
           const instrucciones = this.recorrer(nodo.hijos[7]);
@@ -515,11 +543,11 @@ export class Traduccion {
           const tipo = tipo_funcion.tipo;
           const referencia = tipo_funcion.type_generador;
 
-          return new DecFuncion({linea, id, tipo, referencia, instrucciones});
+          return new DecFuncion({ linea, id, tipo, referencia, instrucciones });
         }
         case 10:
           //function id par_izq LISTA_PARAMETROS par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der
-          if(this.soyNodo('LISTA_PARAMETROS', nodo.hijos[3]) && this.soyNodo('TIPO_VARIABLE_NATIVA', nodo.hijos[6]) && this.soyNodo('INSTRUCCIONES', nodo.hijos[8])){
+          if (this.soyNodo('LISTA_PARAMETROS', nodo.hijos[3]) && this.soyNodo('TIPO_VARIABLE_NATIVA', nodo.hijos[6]) && this.soyNodo('INSTRUCCIONES', nodo.hijos[8])) {
             const parametros = this.recorrer(nodo.hijos[3]);
             const tipo_funcion = this.recorrer(nodo.hijos[6]);
             const instrucciones = this.recorrer(nodo.hijos[8]);
@@ -528,19 +556,19 @@ export class Traduccion {
             const tipo = tipo_funcion.tipo;
             const referencia = tipo_funcion.type_generador;
 
-            return new DecFuncion({linea, id, tipo, referencia, parametros, instrucciones});
+            return new DecFuncion({ linea, id, tipo, referencia, parametros, instrucciones });
           }
       }
     }
 
     //LISTA_PARAMETROS  ---->  [Variable...]
-    else if(this.soyNodo('LISTA_PARAMETROS', nodo)){
-      const lista : Variable[] = [];
+    else if (this.soyNodo('LISTA_PARAMETROS', nodo)) {
+      const lista: Variable[] = [];
       nodo.hijos.forEach((nodoHijo: any) => {
-        if(nodoHijo instanceof Object){
+        if (nodoHijo instanceof Object) {
           const variable = this.recorrer(nodoHijo);
           //Si es valida
-          if(variable){
+          if (variable) {
             lista.push(variable);
           }
         }
@@ -549,26 +577,26 @@ export class Traduccion {
     }
 
     //PARAMETRO  ---->  Variable
-    else if(this.soyNodo('PARAMETRO', nodo)){
+    else if (this.soyNodo('PARAMETRO', nodo)) {
       const id = nodo.hijos[0];
       const reasignable = true;
-      switch(nodo.hijos.length){
+      switch (nodo.hijos.length) {
         //id dos_puntos TIPO_VARIABLE_NATIVA
         case 3: {
           //{ tipo, type_generador? }
           const tipo_variable_nativa = this.recorrer(nodo.hijos[2]);
           const tipo = tipo_variable_nativa.tipo;
           const referencia = tipo_variable_nativa.type_generador ?? null;
-          return new Variable({id, tipo, reasignable, referencia});
+          return new Variable({ id, tipo, reasignable, referencia });
         }
       }
     }
 
     //LLAMADA_FUNCION
-    else if(this.soyNodo('LLAMADA_FUNCION', nodo)){
+    else if (this.soyNodo('LLAMADA_FUNCION', nodo)) {
       const id = nodo.hijos[0];
 
-      switch(nodo.hijos.length){
+      switch (nodo.hijos.length) {
         //id par_izq par_der punto_coma
         case 4:
           return new LlamadaFuncion(nodo.linea, id);
@@ -580,9 +608,9 @@ export class Traduccion {
     }
 
     //LLAMADA_FUNCION_EXP
-    else if(this.soyNodo('LLAMADA_FUNCION_EXP', nodo)){
+    else if (this.soyNodo('LLAMADA_FUNCION_EXP', nodo)) {
       const id = nodo.hijos[0];
-      switch(nodo.hijos.length){
+      switch (nodo.hijos.length) {
         //id par_izq par_der
         case 3:
           return new LlamadaFuncion(nodo.linea, id);
@@ -594,8 +622,8 @@ export class Traduccion {
     }
 
     //RETURN
-    else if(this.soyNodo('RETURN', nodo)){
-      switch(nodo.hijos.length){
+    else if (this.soyNodo('RETURN', nodo)) {
+      switch (nodo.hijos.length) {
         //return EXP punto_coma
         case 3:
           const exp = this.recorrer(nodo.hijos[1]);
@@ -607,20 +635,20 @@ export class Traduccion {
     }
 
     //BREAK
-    else if(this.soyNodo('BREAK', nodo)){
+    else if (this.soyNodo('BREAK', nodo)) {
       //break punto_coma
       return new Break(nodo.linea);
     }
 
     //DEFAULT
-    else if(this.soyNodo('DEFAULT', nodo)){
+    else if (this.soyNodo('DEFAULT', nodo)) {
       //default dos_puntos INSTRUCCIONES
       const instrucciones = this.recorrer(nodo.hijos[2]);
       return new Case(null, instrucciones, true);
     }
 
     //CASE
-    else if(this.soyNodo('CASE', nodo)){
+    else if (this.soyNodo('CASE', nodo)) {
       //case EXP dos_puntos INSTRUCCIONES
       const exp = this.recorrer(nodo.hijos[1]);
       const instrucciones = this.recorrer(nodo.hijos[3]);
@@ -628,12 +656,12 @@ export class Traduccion {
     }
 
     //LISTA_CASE  ---->  [Case...]
-    else if(this.soyNodo('LISTA_CASE', nodo)){
-      const cases : Case[] = [];
+    else if (this.soyNodo('LISTA_CASE', nodo)) {
+      const cases: Case[] = [];
       nodo.hijos.forEach((nodoHijo: any) => {
-        if(nodoHijo instanceof Object){
+        if (nodoHijo instanceof Object) {
           const caso = this.recorrer(nodoHijo);
-          if(caso){
+          if (caso) {
             cases.push(caso);
           }
         }
@@ -642,7 +670,7 @@ export class Traduccion {
     }
 
     //SWITCH
-    else if(this.soyNodo('SWITCH', nodo)){
+    else if (this.soyNodo('SWITCH', nodo)) {
       //switch par_izq EXP par_der llave_izq LISTA_CASE llave_der
       const exp = this.recorrer(nodo.hijos[2]);
       const cases = this.recorrer(nodo.hijos[5]);
@@ -650,11 +678,11 @@ export class Traduccion {
     }
 
     //ASIGNACION
-    else if(this.soyNodo('ASIGNACION', nodo)){
-      switch(nodo.hijos.length){
+    else if (this.soyNodo('ASIGNACION', nodo)) {
+      switch (nodo.hijos.length) {
         case 4:
           //id TIPO_IGUAL EXP punto_coma
-          if(this.soyNodo('TIPO_IGUAL', nodo.hijos[1]) && this.soyNodo('EXP', nodo.hijos[2])){
+          if (this.soyNodo('TIPO_IGUAL', nodo.hijos[1]) && this.soyNodo('EXP', nodo.hijos[2])) {
             const id = nodo.hijos[0];
             const tipo_igual = this.recorrer(nodo.hijos[1]);
             const exp = this.recorrer(nodo.hijos[2]);
@@ -664,133 +692,133 @@ export class Traduccion {
     }
 
     //TIPO_IGUAL  ---->  '=' | '+=' | '-='
-    else if(this.soyNodo('TIPO_IGUAL', nodo)){
+    else if (this.soyNodo('TIPO_IGUAL', nodo)) {
       //igual - mas igual - menos igual
-      if(nodo.hijos.length == 1)
+      if (nodo.hijos.length == 1)
         return nodo.hijos[0];
       else
         return `${nodo.hijos[0]}${nodo.hijos[1]}`;
     }
 
     //LENGTH
-    else if(this.soyNodo('LENGTH', nodo)){
-      switch(nodo.hijos.length){
+    else if (this.soyNodo('LENGTH', nodo)) {
+      switch (nodo.hijos.length) {
         case 3:
           //STRING punto length
-          if(this.soyNodo('STRING', nodo.hijos[0])){
+          if (this.soyNodo('STRING', nodo.hijos[0])) {
             const exp = this.recorrer(nodo.hijos[0]);
-            return new Length({linea: nodo.linea, exp});
+            return new Length({ linea: nodo.linea, exp });
           }
           //id punto length
-          else{
+          else {
             const id = nodo.hijos[0];
-            return new Length({linea: nodo.linea, id});
+            return new Length({ linea: nodo.linea, id });
           }
         case 5:
           //par_izq EXP par_der punto length
-          if(this.soyNodo('EXP', nodo.hijos[1])){
+          if (this.soyNodo('EXP', nodo.hijos[1])) {
             const exp = this.recorrer(nodo.hijos[1]);
-            return new Length({linea: nodo.linea, exp});
+            return new Length({ linea: nodo.linea, exp });
           }
       }
     }
 
     //CHAR_AT
-    else if(this.soyNodo('CHAR_AT', nodo)){
+    else if (this.soyNodo('CHAR_AT', nodo)) {
       const linea = nodo.linea;
-      switch(nodo.hijos.length){
+      switch (nodo.hijos.length) {
         case 6:
           //string punto charat par_izq EXP par_der
-          if(this.soyNodo('STRING', nodo.hijos[0]) && this.soyNodo('EXP', nodo.hijos[4])){
+          if (this.soyNodo('STRING', nodo.hijos[0]) && this.soyNodo('EXP', nodo.hijos[4])) {
             const exp = this.recorrer(nodo.hijos[0]);
             const pos = this.recorrer(nodo.hijos[4]);
-            return new CharAt({linea, exp, pos});
+            return new CharAt({ linea, exp, pos });
           }
           //id punto charat par_izq EXP par_der
-          else if(this.soyNodo('EXP', nodo.hijos[4])){
+          else if (this.soyNodo('EXP', nodo.hijos[4])) {
             const id = nodo.hijos[0];
             const pos = this.recorrer(nodo.hijos[4]);
-            return new CharAt({linea, id, pos});
+            return new CharAt({ linea, id, pos });
           }
         case 8:
           //par_izq EXP par_der punto charat par_izq EXP par_der
           const exp = this.recorrer(nodo.hijos[1]);
           const pos = this.recorrer(nodo.hijos[6]);
-          return new CharAt({linea, exp, pos});
+          return new CharAt({ linea, exp, pos });
       }
     }
 
     //TO_UPPER_CASE
-    else if(this.soyNodo('TO_UPPER_CASE', nodo)){
+    else if (this.soyNodo('TO_UPPER_CASE', nodo)) {
       const linea = nodo.linea;
-      switch(nodo.hijos.length){
+      switch (nodo.hijos.length) {
         case 5:
           //string punto toUpperCase par_izq par_der
-          if(this.soyNodo('STRING', nodo.hijos[0])){
+          if (this.soyNodo('STRING', nodo.hijos[0])) {
             const exp = this.recorrer(nodo.hijos[0]);
-            return new ToUpperCase({linea, exp});
+            return new ToUpperCase({ linea, exp });
           }
           //id punto toUpperCase par_izq par_der
-          else{
+          else {
             const id = nodo.hijos[0];
-            return new ToUpperCase({linea, id});
+            return new ToUpperCase({ linea, id });
           }
         case 7:
           //par_izq EXP par_der punto toUpperCase par_izq par_der
           const exp = this.recorrer(nodo.hijos[1]);
-          return new ToUpperCase({linea, exp});
+          return new ToUpperCase({ linea, exp });
       }
     }
 
     //TO_LOWER_CASE
-    else if(this.soyNodo('TO_LOWER_CASE', nodo)){
+    else if (this.soyNodo('TO_LOWER_CASE', nodo)) {
       const linea = nodo.linea;
-      switch(nodo.hijos.length){
+      switch (nodo.hijos.length) {
         case 5:
           //string punto toLowerCase par_izq par_der
-          if(this.soyNodo('STRING', nodo.hijos[0])){
+          if (this.soyNodo('STRING', nodo.hijos[0])) {
             const exp = this.recorrer(nodo.hijos[0]);
-            return new ToLowerCase({linea, exp});
+            return new ToLowerCase({ linea, exp });
           }
           //id punto toLowerCase par_izq par_der
-          else{
+          else {
             const id = nodo.hijos[0];
-            return new ToLowerCase({linea, id});
+            return new ToLowerCase({ linea, id });
           }
         case 7:
           //par_izq EXP par_der punto toLowerCase par_izq par_der
           const exp = this.recorrer(nodo.hijos[1]);
-          return new ToLowerCase({linea, exp});
+          return new ToLowerCase({ linea, exp });
       }
     }
 
     //CONCAT
-    else if(this.soyNodo('CONCAT', nodo)){
+    else if (this.soyNodo('CONCAT', nodo)) {
       const linea = nodo.linea;
-      switch(nodo.hijos.length){
+      switch (nodo.hijos.length) {
         case 6:
           //string punto concat par_izq EXP par_der
-          if(this.soyNodo('STRING', nodo.hijos[0]) && this.soyNodo('EXP', nodo.hijos[4])){
+          if (this.soyNodo('STRING', nodo.hijos[0]) && this.soyNodo('EXP', nodo.hijos[4])) {
             const cad1 = this.recorrer(nodo.hijos[0]);
             const cad2 = this.recorrer(nodo.hijos[4]);
-            return new Concat({linea, cad1, cad2});
+            return new Concat({ linea, cad1, cad2 });
           }
           //id punto concat par_izq EXP par_der
-          else if(this.soyNodo('EXP', nodo.hijos[4])){
+          else if (this.soyNodo('EXP', nodo.hijos[4])) {
             const id = nodo.hijos[0];
             const cad2 = this.recorrer(nodo.hijos[4]);
-            return new Concat({linea, id, cad2});
+            return new Concat({ linea, id, cad2 });
           }
         case 8:
           //par_izq EXP par_der punto concat par_izq EXP par_der
           const cad1 = this.recorrer(nodo.hijos[1]);
           const cad2 = this.recorrer(nodo.hijos[6]);
-          return new Concat({linea, cad1, cad2});
+          return new Concat({ linea, cad1, cad2 });
       }
     }
 
     //WHILE
-    else if(this.soyNodo('WHILE', nodo)){
+    else if (this.soyNodo('WHILE', nodo)) {
       //while par_izq EXP par_der llave_izq INSTRUCCIONES llave_der
       const condicion = this.recorrer(nodo.hijos[2]);
       const instrucciones = this.recorrer(nodo.hijos[5]);
@@ -798,7 +826,7 @@ export class Traduccion {
     }
 
     //DO_WHILE
-    else if(this.soyNodo('DO_WHILE', nodo)){
+    else if (this.soyNodo('DO_WHILE', nodo)) {
       //do llave_izq INSTRUCCIONES llave_der while par_izq EXP par_der punto_coma
       const instrucciones = this.recorrer(nodo.hijos[2]);
       const condicion = this.recorrer(nodo.hijos[6]);
@@ -806,29 +834,86 @@ export class Traduccion {
     }
 
     //INCREMENTO_DECREMENTO
-    else if(this.soyNodo('INCREMENTO_DECREMENTO', nodo)){
+    else if (this.soyNodo('INCREMENTO_DECREMENTO', nodo)) {
       const id = nodo.hijos[0];
 
       //id mas_mas punto_coma
-      if(nodo.hijos[1] == '++'){
+      if (nodo.hijos[1] == '++') {
         return new Incremento(nodo.linea, id, true);
       }
       //id menos_menos punto_coma
-      if(nodo.hijos[1] == '--'){
+      if (nodo.hijos[1] == '--') {
         return new Decremento(nodo.linea, id, true);
       }
     }
 
     //FOR
-    else if(this.soyNodo('FOR', nodo)){
+    else if (this.soyNodo('FOR', nodo)) {
       //for par_izq DECLARACION_VARIABLE EXP punto_coma ASIGNACION_FOR par_der llave_izq INSTRUCCIONES llave_der
-      if(this.soyNodo('DECLARACION_VARIABLE', nodo.hijos[2])){
-
+      if (this.soyNodo('DECLARACION_VARIABLE', nodo.hijos[2])) {
+        //[nodoAST...]
+        const init = this.recorrer(nodo.hijos[2]);
+        const condicion = this.recorrer(nodo.hijos[3]);
+        const modificacion = this.recorrer(nodo.hijos[5]);
+        const instrucciones = this.recorrer(nodo.hijos[8]);
+        return new For(nodo.linea, init[0], condicion, modificacion, instrucciones);
       }
       //for par_izq ASIGNACION EXP punto_coma ASIGNACION_FOR par_der llave_izq INSTRUCCIONES llave_der
-      if(this.soyNodo('ASIGNACION', nodo.hijos[2])){
-
+      if (this.soyNodo('ASIGNACION', nodo.hijos[2])) {
+        const init = this.recorrer(nodo.hijos[2]);
+        const condicion = this.recorrer(nodo.hijos[3]);
+        const modificacion = this.recorrer(nodo.hijos[5]);
+        const instrucciones = this.recorrer(nodo.hijos[8]);
+        return new For(nodo.linea, init, condicion, modificacion, instrucciones);
       }
+    }
+
+    //ASIGNACION_FOR
+    else if (this.soyNodo('ASIGNACION_FOR', nodo)) {
+      const id = nodo.hijos[0];
+      switch (nodo.hijos.length) {
+        case 2:
+        //id mas_mas
+        if(nodo.hijos[1] == '++')
+          return new Incremento(nodo.linea, id, true);
+        //id menos_menos
+        if(nodo.hijos[1] == '--')
+          return new Decremento(nodo.linea, id, true);
+        //id TIPO_IGUAL EXP
+        case 3:
+          const tipo_igual = this.recorrer(nodo.hijos[1]);
+          const exp = this.recorrer(nodo.hijos[2]);
+          return new AsignacionId(nodo.linea, id, tipo_igual, exp);
+      }
+    }
+
+    //NEW_ARRAY
+    else if(this.soyNodo('NEW_ARRAY', nodo)){
+      //new Array par_izq EXP par_der
+      const exp = this.recorrer(nodo.hijos[3]);
+      return new Arreglo(nodo.linea, exp);
+    }
+
+    //LISTA_ACCESOS_ARREGLO  ---->  [nodosAST...]
+    else if(this.soyNodo('LISTA_ACCESOS_ARREGLO', nodo)){
+      const lista_exps : NodoAST[] = [];
+      nodo.hijos.forEach((nodoHijo: any) => {
+        if(nodoHijo instanceof Object){
+          const resp = this.recorrer(nodoHijo);
+          if(resp){
+            lista_exps.push(resp);
+          }
+        }
+      });
+      return lista_exps;
+    }
+
+    //ACCESO_ARREGLO
+    else if(this.soyNodo('ACCESO_ARREGLO', nodo)){
+      //id LISTA_ACCESOS_ARREGLO
+      const id = nodo.hijos[0];
+      const lista_exps = this.recorrer(nodo.hijos[1]);
+
     }
   }
 

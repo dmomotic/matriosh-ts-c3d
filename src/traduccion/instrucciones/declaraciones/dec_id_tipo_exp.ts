@@ -35,7 +35,7 @@ export class DecIdTipoExp extends NodoAST{
     let variable = ts.getVariable(this.id);
     //Si la variable ya existe es un error
     if(variable){
-      Errores.push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `No existe ninguna variable con el id: ${this.id} en este ambito`}));
+      Errores.push(new Error({tipo: 'semantico', linea: this.linea, descripcion: `Ya existe una variable con el id: ${this.id} en este ambito`}));
       return;
     }
 

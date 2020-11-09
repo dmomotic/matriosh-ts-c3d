@@ -47,6 +47,30 @@ export class Primitivo extends NodoAST{
             Codigo3D.add(`H = H + 1;`);
             i++;
           }
+          //Si es comilla doble
+          else if(this.valor.charAt(i) == '\\' && i + 1 < this.valor.length && this.valor.charAt(i+1) == '"'){
+            Codigo3D.add(`Heap[(int)H] = ${34};`);
+            Codigo3D.add(`H = H + 1;`);
+            i++;
+          }
+          // Si es una barra invertida
+          else if(this.valor.charAt(i) == '\\' && i + 1 < this.valor.length && this.valor.charAt(i+1) == '\\'){
+            Codigo3D.add(`Heap[(int)H] = ${92};`);
+            Codigo3D.add(`H = H + 1;`);
+            i++;
+          }
+          // Si es un retorno de carro
+          else if(this.valor.charAt(i) == '\\' && i + 1 < this.valor.length && this.valor.charAt(i+1) == 'r'){
+            Codigo3D.add(`Heap[(int)H] = ${13};`);
+            Codigo3D.add(`H = H + 1;`);
+            i++;
+          }
+          //Si es una tabulacion
+          else if(this.valor.charAt(i) == '\\' && i + 1 < this.valor.length && this.valor.charAt(i+1) == 't'){
+            Codigo3D.add(`Heap[(int)H] = ${9};`);
+            Codigo3D.add(`H = H + 1;`);
+            i++;
+          }
           else{
             let ascii = this.valor.charCodeAt(i);
             Codigo3D.add(`Heap[(int)H] = ${ascii};`);
