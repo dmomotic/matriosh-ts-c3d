@@ -44,7 +44,7 @@ class ControlFuncion {
         }
     }
     static hasReturn() {
-        return ControlFuncion.getInstance().tipo != 5 /* VOID */;
+        return ControlFuncion.getInstance().tipo != 5 /* VOID */ && ControlFuncion.getInstance().tipo != 8 /* NULL */;
     }
     static getId() {
         return ControlFuncion.getInstance().id;

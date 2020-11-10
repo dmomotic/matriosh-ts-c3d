@@ -4,7 +4,7 @@ import { Codigo3D } from "../../generales/codigo3D";
 import { NodoAST } from "../../generales/nodoAST";
 import { TablaSimbolos } from "../../generales/tablaSimbolos";
 import { Temporal } from "../../generales/temporal";
-import { getNombreDeTipo, TIPO_DATO } from "../../generales/tipos";
+import { getNombreDeTipo, isTipoNumber, TIPO_DATO } from "../../generales/tipos";
 import { Control } from "../../utils/control";
 import { ControlFuncion } from "../../utils/control_funcion";
 
@@ -64,6 +64,7 @@ export class Multiplicacion extends NodoAST {
     if (t1 == TIPO_DATO.FLOAT && t2 == TIPO_DATO.INT) return TIPO_DATO.FLOAT;
     if (t1 == TIPO_DATO.INT && t2 == TIPO_DATO.FLOAT) return TIPO_DATO.FLOAT;
     if (t1 == TIPO_DATO.INT && t2 == TIPO_DATO.INT) return TIPO_DATO.INT;
+    if(isTipoNumber(t1) && isTipoNumber(t2)) return TIPO_DATO.FLOAT;
     //Cualquier otra combinacion
     return TIPO_DATO.NULL;
   }

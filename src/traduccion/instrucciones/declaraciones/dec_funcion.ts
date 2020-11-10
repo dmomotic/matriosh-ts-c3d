@@ -43,7 +43,6 @@ export class DecFuncion extends NodoAST{
     //Global para el control en la traduccion
     Codigo3D.getInstance().traduciendo_funcion = true;
 
-    Codigo3D.add(``);
     Codigo3D.addComentario(`DECLARACIÓN DE FUNCION: ${this.id}`);
     //Reiniciamos el tamaño
     Tamaño.clear();

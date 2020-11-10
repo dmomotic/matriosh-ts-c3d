@@ -59,6 +59,9 @@ class Modular extends nodoAST_1.NodoAST {
             return 7 /* FLOAT */;
         if (t1 == 6 /* INT */ && t2 == 6 /* INT */)
             return 6 /* INT */;
+        //Solo por seguridad
+        if (tipos_1.isTipoNumber(t1) && tipos_1.isTipoNumber(t2))
+            return 6 /* INT */;
         //Cualquier otra combinacion
         return 8 /* NULL */;
     }

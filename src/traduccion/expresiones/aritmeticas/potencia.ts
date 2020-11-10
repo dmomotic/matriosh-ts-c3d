@@ -5,7 +5,7 @@ import { Etiqueta } from "../../generales/etiqueta";
 import { NodoAST } from "../../generales/nodoAST";
 import { TablaSimbolos } from "../../generales/tablaSimbolos";
 import { Temporal } from "../../generales/temporal";
-import { getNombreDeTipo, TIPO_DATO } from "../../generales/tipos";
+import { getNombreDeTipo, isTipoNumber, TIPO_DATO } from "../../generales/tipos";
 import { Control } from "../../utils/control";
 import { ControlFuncion } from "../../utils/control_funcion";
 
@@ -74,6 +74,8 @@ export class Potencia extends NodoAST {
   private getTipoResultante(t1: TIPO_DATO, t2: TIPO_DATO): TIPO_DATO {
     //Number ** Number
     if ((t1 == TIPO_DATO.FLOAT  || t1 == TIPO_DATO.INT) && (t2 == TIPO_DATO.FLOAT || t2 == TIPO_DATO.INT)) return TIPO_DATO.INT;
+    //Solo por seguridad
+    if(isTipoNumber(t1) && isTipoNumber(t2)) return TIPO_DATO.INT;
     //Cualquier otra combinacion
     return TIPO_DATO.NULL;
   }

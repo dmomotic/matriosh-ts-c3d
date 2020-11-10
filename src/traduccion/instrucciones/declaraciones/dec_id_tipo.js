@@ -20,7 +20,6 @@ class DecIdTipo extends nodoAST_1.NodoAST {
         tama_o_1.Tamaño.aumentar();
     }
     traducir(ts) {
-        console.log('si traduce');
         //Busco en tabla de simbolos
         let variable = ts.getVariable(this.id);
         //Si la variable ya existe es un error

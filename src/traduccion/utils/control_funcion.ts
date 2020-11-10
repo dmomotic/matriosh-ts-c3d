@@ -63,7 +63,7 @@ export class ControlFuncion {
   }
 
   public static hasReturn() : boolean {
-    return ControlFuncion.getInstance().tipo != TIPO_DATO.VOID;
+    return ControlFuncion.getInstance().tipo != TIPO_DATO.VOID && ControlFuncion.getInstance().tipo != TIPO_DATO.NULL;
   }
 
   public static getId() : string {

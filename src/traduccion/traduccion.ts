@@ -53,6 +53,9 @@ import { Arreglo } from './expresiones/arreglo';
 import { DecIdTipoCorchetesExp } from './instrucciones/declaraciones/dec_id_tipo_corchetes_exp';
 import { AccesoArreglo } from './expresiones/acceso_arreglo';
 import { AsignacionArreglo } from './instrucciones/asignaciones/asignacion_arreglo';
+import { Continue } from './instrucciones/flujo/continue';
+import { ForIn } from './instrucciones/ciclos/for_in';
+import { ForOf } from './instrucciones/ciclos/for_of_';
 
 export class Traduccion {
   raiz: Object;
@@ -413,6 +416,14 @@ export class Traduccion {
             const op_der: NodoAST = this.recorrer(nodo.hijos[2]);
             return new Or(nodo.linea, op_izq, op_der);
           }
+          /*****************************
+           * OTRAS OPERACIONES
+           *****************************/
+          //par_izq EXP par_der
+          if(nodo.hijos[0] == '(' && this.soyNodo('EXP', nodo.hijos[1]) && nodo.hijos[2] == ')' ){
+            const exp = this.recorrer(nodo.hijos[1]);
+            return exp;
+          }
       }
     }
 
@@ -591,6 +602,15 @@ export class Traduccion {
           const referencia = tipo_variable_nativa.type_generador ?? null;
           return new Variable({ id, tipo, reasignable, referencia });
         }
+        case 4: {
+          // id dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES
+           //{ tipo, type_generador? }
+           const tipo_variable_nativa = this.recorrer(nodo.hijos[2]);
+           const tipo = tipo_variable_nativa.tipo;
+           const referencia = tipo_variable_nativa.type_generador ?? null;
+           const dimensiones = this.recorrer(nodo.hijos[3]);
+           return new Variable({id, tipo: TIPO_DATO.ARRAY, reasignable, tamaño: dimensiones, tipo_de_arreglo: tipo, referencia});
+        }
       }
     }
 
@@ -640,6 +660,12 @@ export class Traduccion {
     else if (this.soyNodo('BREAK', nodo)) {
       //break punto_coma
       return new Break(nodo.linea);
+    }
+
+    //CONTINUE
+    else if(this.soyNodo('CONTINUE', nodo)){
+      //continue punto_coma
+      return new Continue(nodo.linea);
     }
 
     //DEFAULT
@@ -924,6 +950,31 @@ export class Traduccion {
       const lista_exps = this.recorrer(nodo.hijos[1]);
       return new AccesoArreglo(nodo.linea, id, lista_exps);
     }
+
+    //FOR_IN
+    else if(this.soyNodo('FOR_IN', nodo)){
+      //for par_izq TIPO_DEC_VARIABLE id in EXP par_der llave_izq INSTRUCCIONES llave_der
+      const reasignable = this.recorrer(nodo.hijos[2]);
+      const id = nodo.hijos[3];
+      const arr = this.recorrer(nodo.hijos[5]);
+      const instrucciones = this.recorrer(nodo.hijos[8]);
+      const linea = nodo.linea;
+      const declaracion = new DecIdTipo(linea, reasignable, id, TIPO_DATO.INT, null);
+      return new ForIn(linea, id, declaracion, arr, instrucciones);
+    }
+
+    //FOR_OF
+    else if(this.soyNodo('FOR_OF', nodo)){
+      //for par_izq TIPO_DEC_VARIABLE id of EXP par_der llave_izq INSTRUCCIONES llave_der
+      const reasignable = this.recorrer(nodo.hijos[2]);
+      const id = nodo.hijos[3];
+      const arr = this.recorrer(nodo.hijos[5]);
+      const instrucciones = this.recorrer(nodo.hijos[8]);
+      const linea = nodo.linea;
+      const declaracion = new DecIdTipo(linea, reasignable, id, TIPO_DATO.INT, null);
+      return new ForOf(linea, id, declaracion, arr, instrucciones);
+    }
+
   }
 
   /**

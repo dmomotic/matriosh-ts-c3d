@@ -16,6 +16,7 @@ class For extends nodoAST_1.NodoAST {
         Object.assign(this, { init, condicion, modificacion, instrucciones });
     }
     calcularTamaño() {
+        this.init.calcularTamaño();
         for (const inst of this.instrucciones) {
             inst.calcularTamaño();
         }
@@ -26,8 +27,9 @@ class For extends nodoAST_1.NodoAST {
         //Traduccion de la sentencia inicial del FOR
         this.init.traducir(ts_local);
         const lbl_ciclo = etiqueta_1.Etiqueta.getSiguiente();
+        const lbl_modificacion = etiqueta_1.Etiqueta.getSiguiente();
         //Display del ciclo
-        control_funcion_1.ControlFuncion.pushDisplay(new display_1.Display([], lbl_ciclo, true));
+        control_funcion_1.ControlFuncion.pushDisplay(new display_1.Display([], lbl_modificacion, true));
         codigo3D_1.Codigo3D.add(`${lbl_ciclo}:`);
         const control_for = this.condicion.traducir(ts_local);
         if (!control_for) {
@@ -48,11 +50,19 @@ class For extends nodoAST_1.NodoAST {
             for (const inst of this.instrucciones) {
                 inst.traducir(ts_local);
             }
+            codigo3D_1.Codigo3D.add(`${lbl_modificacion}:`); //Agregada por el continue
             this.modificacion.traducir(ts_local);
             codigo3D_1.Codigo3D.add(`goto ${lbl_ciclo};`);
             //Imprimo las etiquetas falsas
             for (const lbl of control_for.falsas) {
                 codigo3D_1.Codigo3D.add(`${lbl}:`);
+            }
+            //Agregado por el brak
+            const display = control_funcion_1.ControlFuncion.popDisplay();
+            if (!display)
+                return;
+            for (const br of display.breaks) {
+                codigo3D_1.Codigo3D.add(`${br}:`);
             }
         }
         //Si no trae etiquetas
@@ -68,9 +78,17 @@ class For extends nodoAST_1.NodoAST {
             for (const inst of this.instrucciones) {
                 inst.traducir(ts_local);
             }
+            codigo3D_1.Codigo3D.add(`${lbl_modificacion}:`); //Agregada por el continue
             this.modificacion.traducir(ts_local);
             codigo3D_1.Codigo3D.add(`goto ${lbl_ciclo};`);
             codigo3D_1.Codigo3D.add(`${lbl_false}:`);
+            //Agregado por el break
+            const display = control_funcion_1.ControlFuncion.popDisplay();
+            if (!display)
+                return;
+            for (const br of display.breaks) {
+                codigo3D_1.Codigo3D.add(`${br}:`);
+            }
         }
         codigo3D_1.Codigo3D.addComentario(`Fin instruccion FOR`);
     }

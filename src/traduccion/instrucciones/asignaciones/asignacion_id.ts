@@ -63,8 +63,8 @@ export class AsignacionId extends NodoAST{
       //Capturo la posicion en la que se encuentra
       Codigo3D.add(`${pos} = ${variable.posicion};`);
 
-      //Si es una variable Number | Boolean | String
-      if(isTipoNumber(variable.tipo) || isTipoBoolean(variable.tipo) || isTipoString(variable.tipo)){
+      //Si es una variable Number | Boolean | String | Array
+      if(isTipoNumber(variable.tipo) || isTipoBoolean(variable.tipo) || isTipoString(variable.tipo) || variable.isArray()){
         Codigo3D.add(`Heap[(int)${pos}] = ${control.temporal};`);
       }
       //TODO: continuar con los demas tipos
@@ -73,8 +73,8 @@ export class AsignacionId extends NodoAST{
     else{
       //Capturo la posicion en la que se encuentra
       Codigo3D.add(`${pos} = P + ${variable.posicion};`);
-      //Si es una variable Number | Boolean | String
-      if(isTipoNumber(variable.tipo) || isTipoBoolean(variable.tipo) || isTipoString(variable.tipo)){
+      //Si es una variable Number | Boolean | String | Array
+      if(isTipoNumber(variable.tipo) || isTipoBoolean(variable.tipo) || isTipoString(variable.tipo) || variable.isArray()){
         Codigo3D.add(`Stack[(int)${pos}] = ${control.temporal};`);
       }
       //TODO: continuar con los demas tipo
@@ -84,16 +84,13 @@ export class AsignacionId extends NodoAST{
   private validarTipos(t1: TIPO_DATO, t2: TIPO_DATO) : boolean {
     //number -> boolean -> string -> type -> array
 
+    //boolean - boolean
+    //string - string
+    //type - type
+    //array - array
+    if(t1 === t2) return true;
     //number - number
     if(isTipoNumber(t1) && isTipoNumber(t2)) return true;
-    //boolean - boolean
-    if(isTipoBoolean(t1) && isTipoBoolean(t2)) return true;
-    //string - string
-    if(isTipoString(t1) && isTipoString(t2)) return true;
-    //type - type
-    if(isTipoType(t1) && isTipoType(t2)) return true;
-    //array - array
-    if(isTipoArray(t1) && isTipoArray(t2)) return true;
     //string - null
     //type - null
     //array - null

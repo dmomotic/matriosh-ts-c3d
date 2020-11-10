@@ -54,6 +54,9 @@ const arreglo_1 = require("./expresiones/arreglo");
 const dec_id_tipo_corchetes_exp_1 = require("./instrucciones/declaraciones/dec_id_tipo_corchetes_exp");
 const acceso_arreglo_1 = require("./expresiones/acceso_arreglo");
 const asignacion_arreglo_1 = require("./instrucciones/asignaciones/asignacion_arreglo");
+const continue_1 = require("./instrucciones/flujo/continue");
+const for_in_1 = require("./instrucciones/ciclos/for_in");
+const for_of_1 = require("./instrucciones/ciclos/for_of_");
 class Traduccion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
@@ -148,7 +151,7 @@ class Traduccion {
         return label;
     }
     recorrer(nodo) {
-        var _a;
+        var _a, _b;
         //S  ---->  [nodosAST...]
         if (this.soyNodo('S', nodo)) {
             return this.recorrer(nodo.hijos[0]);
@@ -395,6 +398,14 @@ class Traduccion {
                         const op_der = this.recorrer(nodo.hijos[2]);
                         return new or_1.Or(nodo.linea, op_izq, op_der);
                     }
+                    /*****************************
+                     * OTRAS OPERACIONES
+                     *****************************/
+                    //par_izq EXP par_der
+                    if (nodo.hijos[0] == '(' && this.soyNodo('EXP', nodo.hijos[1]) && nodo.hijos[2] == ')') {
+                        const exp = this.recorrer(nodo.hijos[1]);
+                        return exp;
+                    }
             }
         }
         //NUMBER
@@ -554,6 +565,15 @@ class Traduccion {
                     const referencia = (_a = tipo_variable_nativa.type_generador) !== null && _a !== void 0 ? _a : null;
                     return new variable_1.Variable({ id, tipo, reasignable, referencia });
                 }
+                case 4: {
+                    // id dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES
+                    //{ tipo, type_generador? }
+                    const tipo_variable_nativa = this.recorrer(nodo.hijos[2]);
+                    const tipo = tipo_variable_nativa.tipo;
+                    const referencia = (_b = tipo_variable_nativa.type_generador) !== null && _b !== void 0 ? _b : null;
+                    const dimensiones = this.recorrer(nodo.hijos[3]);
+                    return new variable_1.Variable({ id, tipo: 4 /* ARRAY */, reasignable, tamaño: dimensiones, tipo_de_arreglo: tipo, referencia });
+                }
             }
         }
         //LLAMADA_FUNCION
@@ -598,6 +618,11 @@ class Traduccion {
         else if (this.soyNodo('BREAK', nodo)) {
             //break punto_coma
             return new break_1.Break(nodo.linea);
+        }
+        //CONTINUE
+        else if (this.soyNodo('CONTINUE', nodo)) {
+            //continue punto_coma
+            return new continue_1.Continue(nodo.linea);
         }
         //DEFAULT
         else if (this.soyNodo('DEFAULT', nodo)) {
@@ -861,6 +886,28 @@ class Traduccion {
             const id = nodo.hijos[0];
             const lista_exps = this.recorrer(nodo.hijos[1]);
             return new acceso_arreglo_1.AccesoArreglo(nodo.linea, id, lista_exps);
+        }
+        //FOR_IN
+        else if (this.soyNodo('FOR_IN', nodo)) {
+            //for par_izq TIPO_DEC_VARIABLE id in EXP par_der llave_izq INSTRUCCIONES llave_der
+            const reasignable = this.recorrer(nodo.hijos[2]);
+            const id = nodo.hijos[3];
+            const arr = this.recorrer(nodo.hijos[5]);
+            const instrucciones = this.recorrer(nodo.hijos[8]);
+            const linea = nodo.linea;
+            const declaracion = new dec_id_tipo_1.DecIdTipo(linea, reasignable, id, 6 /* INT */, null);
+            return new for_in_1.ForIn(linea, id, declaracion, arr, instrucciones);
+        }
+        //FOR_OF
+        else if (this.soyNodo('FOR_OF', nodo)) {
+            //for par_izq TIPO_DEC_VARIABLE id of EXP par_der llave_izq INSTRUCCIONES llave_der
+            const reasignable = this.recorrer(nodo.hijos[2]);
+            const id = nodo.hijos[3];
+            const arr = this.recorrer(nodo.hijos[5]);
+            const instrucciones = this.recorrer(nodo.hijos[8]);
+            const linea = nodo.linea;
+            const declaracion = new dec_id_tipo_1.DecIdTipo(linea, reasignable, id, 6 /* INT */, null);
+            return new for_of_1.ForOf(linea, id, declaracion, arr, instrucciones);
         }
     }
     /**

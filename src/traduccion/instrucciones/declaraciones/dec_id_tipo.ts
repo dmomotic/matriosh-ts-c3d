@@ -27,8 +27,6 @@ export class DecIdTipo extends NodoAST {
   }
 
   traducir(ts: TablaSimbolos) {
-    console.log('si traduce');
-
     //Busco en tabla de simbolos
     let variable = ts.getVariable(this.id);
     //Si la variable ya existe es un error

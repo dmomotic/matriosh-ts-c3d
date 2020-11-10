@@ -32,7 +32,6 @@ class DecFuncion extends nodoAST_1.NodoAST {
         }
         //Global para el control en la traduccion
         codigo3D_1.Codigo3D.getInstance().traduciendo_funcion = true;
-        codigo3D_1.Codigo3D.add(``);
         codigo3D_1.Codigo3D.addComentario(`DECLARACIÓN DE FUNCION: ${this.id}`);
         //Reiniciamos el tamaño
         tama_o_1.Tamaño.clear();

@@ -65,6 +65,9 @@ class Potencia extends nodoAST_1.NodoAST {
         //Number ** Number
         if ((t1 == 7 /* FLOAT */ || t1 == 6 /* INT */) && (t2 == 7 /* FLOAT */ || t2 == 6 /* INT */))
             return 6 /* INT */;
+        //Solo por seguridad
+        if (tipos_1.isTipoNumber(t1) && tipos_1.isTipoNumber(t2))
+            return 6 /* INT */;
         //Cualquier otra combinacion
         return 8 /* NULL */;
     }

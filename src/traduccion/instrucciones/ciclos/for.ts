@@ -22,6 +22,8 @@ export class For extends NodoAST {
   }
 
   calcularTamaño(): void {
+    this.init.calcularTamaño();
+
     for(const inst of this.instrucciones){
       inst.calcularTamaño();
     }
@@ -33,8 +35,9 @@ export class For extends NodoAST {
     //Traduccion de la sentencia inicial del FOR
     this.init.traducir(ts_local);
     const lbl_ciclo = Etiqueta.getSiguiente();
+    const lbl_modificacion = Etiqueta.getSiguiente();
     //Display del ciclo
-    ControlFuncion.pushDisplay(new Display([], lbl_ciclo, true));
+    ControlFuncion.pushDisplay(new Display([], lbl_modificacion, true));
     Codigo3D.add(`${lbl_ciclo}:`);
 
     const control_for : Control = this.condicion.traducir(ts_local);
@@ -57,11 +60,18 @@ export class For extends NodoAST {
       for(const inst of this.instrucciones){
         inst.traducir(ts_local);
       }
+      Codigo3D.add(`${lbl_modificacion}:`); //Agregada por el continue
       this.modificacion.traducir(ts_local);
       Codigo3D.add(`goto ${lbl_ciclo};`);
       //Imprimo las etiquetas falsas
       for(const lbl of control_for.falsas){
         Codigo3D.add(`${lbl}:`);
+      }
+      //Agregado por el brak
+      const display = ControlFuncion.popDisplay();
+      if(!display) return;
+      for(const br of display.breaks){
+        Codigo3D.add(`${br}:`);
       }
     }
     //Si no trae etiquetas
@@ -77,9 +87,16 @@ export class For extends NodoAST {
       for(const inst of this.instrucciones){
         inst.traducir(ts_local);
       }
+      Codigo3D.add(`${lbl_modificacion}:`); //Agregada por el continue
       this.modificacion.traducir(ts_local);
       Codigo3D.add(`goto ${lbl_ciclo};`);
       Codigo3D.add(`${lbl_false}:`);
+      //Agregado por el break
+      const display = ControlFuncion.popDisplay();
+      if(!display) return;
+      for(const br of display.breaks){
+        Codigo3D.add(`${br}:`);
+      }
     }
 
     Codigo3D.addComentario(`Fin instruccion FOR`);

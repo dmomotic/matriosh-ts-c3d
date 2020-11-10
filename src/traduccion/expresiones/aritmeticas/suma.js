@@ -156,6 +156,9 @@ class Suma extends nodoAST_1.NodoAST {
         //String - String
         if (t1 == 0 /* STRING */ && t2 == 0 /* STRING */)
             return 0 /* STRING */;
+        //Solo por seguridad
+        if (tipos_1.isTipoNumber(t1) && tipos_1.isTipoNumber(t2))
+            return 7 /* FLOAT */;
         //Cualquier otra combinacion
         return 8 /* NULL */;
     }

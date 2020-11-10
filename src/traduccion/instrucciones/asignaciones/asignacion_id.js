@@ -46,8 +46,8 @@ class AsignacionId extends nodoAST_1.NodoAST {
         if (variable.isGlobal()) {
             //Capturo la posicion en la que se encuentra
             codigo3D_1.Codigo3D.add(`${pos} = ${variable.posicion};`);
-            //Si es una variable Number | Boolean | String
-            if (tipos_1.isTipoNumber(variable.tipo) || tipos_1.isTipoBoolean(variable.tipo) || tipos_1.isTipoString(variable.tipo)) {
+            //Si es una variable Number | Boolean | String | Array
+            if (tipos_1.isTipoNumber(variable.tipo) || tipos_1.isTipoBoolean(variable.tipo) || tipos_1.isTipoString(variable.tipo) || variable.isArray()) {
                 codigo3D_1.Codigo3D.add(`Heap[(int)${pos}] = ${control.temporal};`);
             }
             //TODO: continuar con los demas tipos
@@ -56,8 +56,8 @@ class AsignacionId extends nodoAST_1.NodoAST {
         else {
             //Capturo la posicion en la que se encuentra
             codigo3D_1.Codigo3D.add(`${pos} = P + ${variable.posicion};`);
-            //Si es una variable Number | Boolean | String
-            if (tipos_1.isTipoNumber(variable.tipo) || tipos_1.isTipoBoolean(variable.tipo) || tipos_1.isTipoString(variable.tipo)) {
+            //Si es una variable Number | Boolean | String | Array
+            if (tipos_1.isTipoNumber(variable.tipo) || tipos_1.isTipoBoolean(variable.tipo) || tipos_1.isTipoString(variable.tipo) || variable.isArray()) {
                 codigo3D_1.Codigo3D.add(`Stack[(int)${pos}] = ${control.temporal};`);
             }
             //TODO: continuar con los demas tipo
@@ -65,20 +65,14 @@ class AsignacionId extends nodoAST_1.NodoAST {
     }
     validarTipos(t1, t2) {
         //number -> boolean -> string -> type -> array
+        //boolean - boolean
+        //string - string
+        //type - type
+        //array - array
+        if (t1 === t2)
+            return true;
         //number - number
         if (tipos_1.isTipoNumber(t1) && tipos_1.isTipoNumber(t2))
-            return true;
-        //boolean - boolean
-        if (tipos_1.isTipoBoolean(t1) && tipos_1.isTipoBoolean(t2))
-            return true;
-        //string - string
-        if (tipos_1.isTipoString(t1) && tipos_1.isTipoString(t2))
-            return true;
-        //type - type
-        if (tipos_1.isTipoType(t1) && tipos_1.isTipoType(t2))
-            return true;
-        //array - array
-        if (tipos_1.isTipoArray(t1) && tipos_1.isTipoArray(t2))
             return true;
         //string - null
         //type - null

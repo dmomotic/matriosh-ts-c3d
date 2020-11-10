@@ -59,6 +59,8 @@ class Multiplicacion extends nodoAST_1.NodoAST {
             return 7 /* FLOAT */;
         if (t1 == 6 /* INT */ && t2 == 6 /* INT */)
             return 6 /* INT */;
+        if (tipos_1.isTipoNumber(t1) && tipos_1.isTipoNumber(t2))
+            return 7 /* FLOAT */;
         //Cualquier otra combinacion
         return 8 /* NULL */;
     }
