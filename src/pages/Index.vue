@@ -4,6 +4,7 @@
       <div class="col-12">
         <q-btn-group push spread>
           <q-btn push label="Traducir" icon="transform" @click="traducir" />
+          <q-btn push label="Optimizar" icon="3d_rotation" @click="optimizar" v-if="hasC3D" />
           <q-btn push label="Copiar C3D" icon="content_copy" @click="copiar" v-if="showCopyButton"/>
           <q-btn push label="Limpiar" icon="cleaning_services" @click="limpiar" />
         </q-btn-group>
@@ -16,8 +17,13 @@
         <q-card class="my-card">
           <q-tabs v-model="tab" class="text-white bg-deep-orange-5">
             <q-tab label="Editor" name="editor" />
-            <q-tab label="Errores" name="errores" v-if="errores != null && errores.length > 0" />
-            <q-tab label="Consola" name="consola" />
+            <q-tab label="Errores" name="errores" v-if="hasErrors" />
+            <!-- <q-tab label="Consola" name="consola" /> -->
+            <q-tab
+              label="Tabla de Símbolos"
+              name="tabla_de_simbolos"
+              v-if="hasEntornos"
+            />
             <q-tab label="AST" name="ast" />
           </q-tabs>
 
@@ -33,7 +39,7 @@
                 </div>
             </q-tab-panel>
 
-            <q-tab-panel name="errores" v-if="errores != null && errores.length > 0">
+            <q-tab-panel name="errores" v-if="hasErrors">
               <div class="q-pa-md">
                 <q-table
                   title="Lista de Errores Obtenidos"
@@ -49,7 +55,7 @@
               </div>
             </q-tab-panel>
 
-            <q-tab-panel name="consola" class="bg-grey-10 text-white">
+            <!-- <q-tab-panel name="consola" class="bg-grey-10 text-white">
               <q-list dark bordered separator dense>
                 <q-item
                   clickable
@@ -60,6 +66,10 @@
                   <q-item-section>{{ item }}</q-item-section>
                 </q-item>
               </q-list>
+            </q-tab-panel> -->
+
+            <q-tab-panel name="tabla_de_simbolos" v-if="hasEntornos">
+              <tabla-simbolos :entornos="entornos" />
             </q-tab-panel>
 
             <q-tab-panel name="ast" style="height: 500px">
@@ -87,10 +97,14 @@ import "codemirror/mode/javascript/javascript.js";
 import "codemirror/mode/clike/clike.js";
 // Analizador
 import analizador from "../analizador/gramatica";
+// Optimizacion
+import optimizacion from "../analizador/optimizacion";
 //Traduccion
 import { Traduccion } from "../traduccion/traduccion";
 //Errores
 import { Errores } from '../arbol/errores';
+//Entornos
+import { Entornos } from '../traduccion/generales/entornos';
 
 export default {
   components: {
@@ -134,6 +148,7 @@ export default {
           align: "left",
         },
       ],
+      entornos: []
     };
   },
   computed: {
@@ -144,6 +159,14 @@ export default {
     /** @returns {boolean} */
     hasErrors(){
       return this.errores != null && this.errores.length > 0;
+    },
+    /** @returns {boolean} */
+    hasEntornos(){
+      return this.entornos != null && this.entornos.length > 0;
+    },
+    /** @returns {boolean} */
+    hasC3D(){
+      return this.traduccion != null && this.traduccion.trim() != '';
     }
   },
   methods: {
@@ -163,6 +186,15 @@ export default {
           },
         ],
       });
+    },
+    optimizar(){
+      try{
+        console.log(optimizacion.parse(this.traduccion));
+        this.notificar('info', 'Optimización realizada');
+      } catch (error) {
+        this.notificar("negative", error ? JSON.stringify(error) : 'Algo salió mal :(');
+      }
+
     },
     traducir() {
       if (this.code.trim() == "") {
@@ -184,6 +216,7 @@ export default {
         this.dot = traduccion.getDot();
         const codigo = traduccion.traducir() || '';
         this.traduccion = beautify_js(codigo, { indent_size: 2 });
+        this.entornos = Entornos.getLista();
         this.notificar("primary", "Traducción realizada con éxito");
       } catch (error) {
         this.notificar("negative", JSON.stringify(error));
@@ -194,6 +227,7 @@ export default {
       this.code = '';
       this.traduccion = '';
       Errores.clear();
+      this.entornos = [];
     },
     codigoEditado(){},
     copiar(){

@@ -57,11 +57,13 @@ const asignacion_arreglo_1 = require("./instrucciones/asignaciones/asignacion_ar
 const continue_1 = require("./instrucciones/flujo/continue");
 const for_in_1 = require("./instrucciones/ciclos/for_in");
 const for_of_1 = require("./instrucciones/ciclos/for_of_");
+const entornos_1 = require("./generales/entornos");
 class Traduccion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
     }
     traducir() {
+        entornos_1.Entornos.clear();
         errores_1.Errores.clear();
         stack_1.Stack.clear();
         heap_1.Heap.clear();
@@ -75,6 +77,7 @@ class Traduccion {
                 instruccion.traducir(ts_global);
             }
         });
+        entornos_1.Entornos.push(ts_global);
         this.reservarGlobalesEnHeap();
         codigo3D_1.Codigo3D.addInit('void main()\n{');
         codigo3D_1.Codigo3D.addInit(codigo3D_1.Codigo3D.getCodigoFunciones());

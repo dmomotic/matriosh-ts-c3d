@@ -1,4 +1,4 @@
-import { TIPO_DATO } from "./tipos";
+import { getNombreDeTipo, isTipoArray, TIPO_DATO } from "./tipos";
 import { Variable } from "./variable";
 
 export class Funcion {
@@ -9,6 +9,12 @@ export class Funcion {
   referencia: string;
   tipo_de_arreglo: TIPO_DATO;
   dimensiones: number[];
+
+  public toString() : string{
+    const parametros = this.parametros != null ? this.parametros.length : 0;
+    let salida = `Funcion: ${this.id} - Tipo: ${getNombreDeTipo(this.tipo)} - Parametros: ${parametros} - Return Asignado: ${this.hasReturn()?'Si':'No'}`;
+    return salida;
+  }
 
   constructor({id, parametros = [], tamaño = 1, tipo = TIPO_DATO.VOID, referencia = null, tipo_de_arreglo = null, dimensiones = []} : {id: string, parametros: Variable[], tamaño?: number, tipo?: TIPO_DATO, referencia?: string, tipo_de_arreglo?: TIPO_DATO, dimensiones?: number[]}){
     Object.assign(this, {id, parametros, tamaño, tipo, referencia, tipo_de_arreglo, dimensiones});

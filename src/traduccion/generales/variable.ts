@@ -1,4 +1,4 @@
-import { TIPO_DATO } from "./tipos";
+import { getNombreDeTipo, isTipoArray, TIPO_DATO } from "./tipos";
 
 export class Variable {
   id: string;
@@ -10,6 +10,14 @@ export class Variable {
   reasignable: boolean;
   tamaño: number;
   posicion: number;
+
+  public toString() : string{
+    let salida = `Variable: ${this.id} - Global: ${this.global?'Si':'No'} - Tipo: ${getNombreDeTipo(this.tipo)} - Const: ${this.reasignable?'No':'Si'} - Pos: ${this.posicion} - Valor asignado: ${this.inicializado ?'Si':'No'}`;
+    if(isTipoArray(this.tipo)){
+      salida += ` - Tipo Array: ${getNombreDeTipo(this.tipo_de_arreglo)}`;
+    }
+    return salida;
+  }
 
   constructor({ id, tipo, reasignable, posicion = -1, inicializado = false, tamaño = 1, global = false, referencia = null, tipo_de_arreglo = null }: { id: string, tipo: TIPO_DATO, reasignable: boolean, posicion?: number, inicializado?: boolean, tamaño?: number, global?: boolean, referencia?: string, tipo_de_arreglo?: TIPO_DATO }) {
     Object.assign(this, {id, tipo, reasignable, posicion, inicializado, tamaño, global, referencia, tipo_de_arreglo});

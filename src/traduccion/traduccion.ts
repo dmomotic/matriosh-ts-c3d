@@ -9,7 +9,6 @@ import { Etiqueta } from './generales/etiqueta';
 import { Codigo3D } from './generales/codigo3D';
 import { Heap } from './estructuras/heap';
 import { Stack } from './estructuras/stack';
-import { FuncionesPropias } from './utils/funciones_propias';
 import { Id } from './expresiones/id';
 import { ConsoleLog } from './instrucciones/console_log';
 import { If } from './estructuras/If';
@@ -56,6 +55,7 @@ import { AsignacionArreglo } from './instrucciones/asignaciones/asignacion_arreg
 import { Continue } from './instrucciones/flujo/continue';
 import { ForIn } from './instrucciones/ciclos/for_in';
 import { ForOf } from './instrucciones/ciclos/for_of_';
+import { Entornos } from './generales/entornos';
 
 export class Traduccion {
   raiz: Object;
@@ -67,6 +67,7 @@ export class Traduccion {
   }
 
   traducir(): string {
+    Entornos.clear();
     Errores.clear();
     Stack.clear();
     Heap.clear();
@@ -80,7 +81,7 @@ export class Traduccion {
         instruccion.traducir(ts_global);
       }
     });
-
+    Entornos.push(ts_global);
     this.reservarGlobalesEnHeap();
     Codigo3D.addInit('void main()\n{');
     Codigo3D.addInit(Codigo3D.getCodigoFunciones());
