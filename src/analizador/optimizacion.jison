@@ -62,6 +62,8 @@
   const Funcion = require('../optimizacion/funcion').Funcion;
   const AsignacionDosDirecciones = require('../optimizacion/asignacion_dos_direcciones').AsignacionDosDirecciones;
   const AsignacionTresDirecciones = require('../optimizacion/asignacion_tres_direcciones').AsignacionTresDirecciones;
+  const Goto = require('../optimizacion/goto').Goto;
+  const InstIf = require('../optimizacion/inst_if').InstIf;
 %}
 
 %start S
@@ -143,11 +145,11 @@ ETIQUETA
 ;
 
 GOTO
-  : goto id punto_coma { $$ = new InstruccionSinOptimizacion(yylineno, `${$1} ${$2}${$3}\n`); }
+  : goto id punto_coma { $$ = new Goto(yylineno, `${$1} ${$2}${$3}\n`); }
 ;
 
 IF
-  : if par_izq EXP OP_RELACIONAL EXP par_der goto id punto_coma { $$ = new InstruccionSinOptimizacion(yylineno, `${$1}${$2}${$3}${$4}${$5}${$6}${$7} ${$8}${$9}\n`); }
+  : if par_izq EXP OP_RELACIONAL EXP par_der goto id punto_coma { $$ = new InstIf(yylineno, `${$1}${$2}${$3}${$4}${$5}${$6}${$7} ${$8}${$9}\n`, $3, $4, $5); }
 ;
 
 RETURN
