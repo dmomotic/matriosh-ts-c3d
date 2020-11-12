@@ -58,6 +58,8 @@ import { ForOf } from './instrucciones/ciclos/for_of_';
 import { Entornos } from './generales/entornos';
 import { Optimizaciones } from '../optimizacion/optimizaciones';
 import { DecIdTipoCorchetes } from './instrucciones/declaraciones/dec_id_tipo_corchetes';
+import { DiferenteQue } from './expresiones/relacionales/diferente_que';
+import { ArregloConValores } from './expresiones/arreglo_con_valores';
 
 export class Traduccion {
   raiz: Object;
@@ -421,6 +423,12 @@ export class Traduccion {
             const op_der: NodoAST = this.recorrer(nodo.hijos[2]);
             return new IgualQue(nodo.linea, op_izq, op_der);
           }
+          //EXP dif_que EXP
+          if (this.soyNodo('EXP', nodo.hijos[0]) && nodo.hijos[1] == '!=' && this.soyNodo('EXP', nodo.hijos[2])) {
+            const op_izq: NodoAST = this.recorrer(nodo.hijos[0]);
+            const op_der: NodoAST = this.recorrer(nodo.hijos[2]);
+            return new DiferenteQue(nodo.linea, op_izq, op_der);
+          }
           /*****************************
            * OPERACIONES LOGICAS
            *****************************/
@@ -443,6 +451,11 @@ export class Traduccion {
           if(nodo.hijos[0] == '(' && this.soyNodo('EXP', nodo.hijos[1]) && nodo.hijos[2] == ')' ){
             const exp = this.recorrer(nodo.hijos[1]);
             return exp;
+          }
+          //cor_izq LISTA_EXPRESIONES cor_der
+          if(nodo.hijos[0] == '[' && this.soyNodo('LISTA_EXPRESIONES', nodo.hijos[1]) && nodo.hijos[2] == ']'){
+            const exps = this.recorrer(nodo.hijos[1]);
+            return new ArregloConValores(nodo.linea, exps);
           }
       }
     }
