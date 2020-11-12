@@ -143,11 +143,11 @@ ETIQUETA
 ;
 
 GOTO
-  : goto id punto_coma { $$ = new InstruccionSinOptimizacion(yylineno, `${$1}${$2}${$3}\n`); }
+  : goto id punto_coma { $$ = new InstruccionSinOptimizacion(yylineno, `${$1} ${$2}${$3}\n`); }
 ;
 
 IF
-  : if par_izq EXP OP_RELACIONAL EXP par_der GOTO { $$ = new InstruccionSinOptimizacion(yylineno, `${$1}${$2}${$3}${$4}${$5}${$6}${$7}\n`); }
+  : if par_izq EXP OP_RELACIONAL EXP par_der goto id punto_coma { $$ = new InstruccionSinOptimizacion(yylineno, `${$1}${$2}${$3}${$4}${$5}${$6}${$7} ${$8}${$9}\n`); }
 ;
 
 RETURN
@@ -187,6 +187,6 @@ EXP
 ;
 
 ACCESO
-  : heap cor_izq par_izq int par_der EXP cor_der { $$ = new InstruccionSinOptimizacion(yylineno, `${$1}${$2}${$3}${$4}${$5}${$6}${$7}\n`); }
-  | stack cor_izq par_izq int par_der EXP cor_der { $$ = new InstruccionSinOptimizacion(yylineno, `${$1}${$2}${$3}${$4}${$5}${$6}${$7}\n`); }
+  : heap cor_izq par_izq int par_der EXP cor_der { $$ = `${$1}${$2}${$3}${$4}${$5}${$6}${$7}`; }
+  | stack cor_izq par_izq int par_der EXP cor_der { $$ = `${$1}${$2}${$3}${$4}${$5}${$6}${$7}`; }
 ;

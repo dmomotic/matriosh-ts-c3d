@@ -58,11 +58,13 @@ const continue_1 = require("./instrucciones/flujo/continue");
 const for_in_1 = require("./instrucciones/ciclos/for_in");
 const for_of_1 = require("./instrucciones/ciclos/for_of_");
 const entornos_1 = require("./generales/entornos");
+const optimizaciones_1 = require("../optimizacion/optimizaciones");
 class Traduccion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
     }
     traducir() {
+        optimizaciones_1.Optimizaciones.clear();
         entornos_1.Entornos.clear();
         errores_1.Errores.clear();
         stack_1.Stack.clear();

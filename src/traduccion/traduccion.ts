@@ -56,6 +56,7 @@ import { Continue } from './instrucciones/flujo/continue';
 import { ForIn } from './instrucciones/ciclos/for_in';
 import { ForOf } from './instrucciones/ciclos/for_of_';
 import { Entornos } from './generales/entornos';
+import { Optimizaciones } from '../optimizacion/optimizaciones';
 
 export class Traduccion {
   raiz: Object;
@@ -67,6 +68,7 @@ export class Traduccion {
   }
 
   traducir(): string {
+    Optimizaciones.clear();
     Entornos.clear();
     Errores.clear();
     Stack.clear();

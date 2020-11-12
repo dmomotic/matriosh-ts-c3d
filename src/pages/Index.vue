@@ -24,7 +24,8 @@
               name="tabla_de_simbolos"
               v-if="hasEntornos"
             />
-            <q-tab label="AST" name="ast" />
+            <q-tab label="AST" name="ast" v-if="hasDot" />
+            <q-tab label="Optimizaciones" name="optimizaciones" v-if="hasOptimizaciones" />
           </q-tabs>
 
           <q-separator />
@@ -68,12 +69,16 @@
               </q-list>
             </q-tab-panel> -->
 
-            <q-tab-panel name="tabla_de_simbolos" v-if="hasEntornos">
+            <q-tab-panel name="tabla_de_simbolos">
               <tabla-simbolos :entornos="entornos" />
             </q-tab-panel>
 
-            <q-tab-panel name="ast" style="height: 500px">
+            <q-tab-panel name="ast" style="height: 500px" >
               <ast :dot="dot" />
+            </q-tab-panel>
+
+            <q-tab-panel name="optimizaciones">
+              <optimizaciones :optimizaciones="optimizaciones" />
             </q-tab-panel>
           </q-tab-panels>
         </q-card>
@@ -97,10 +102,11 @@ import "codemirror/mode/javascript/javascript.js";
 import "codemirror/mode/clike/clike.js";
 // Analizador
 import analizador from "../analizador/gramatica";
-// Optimizacion
-import optimizacion from "../analizador/optimizacion";
+import analizadorOp from '../analizador/optimizacion';
 //Traduccion
 import { Traduccion } from "../traduccion/traduccion";
+//Optimizacion
+import { Optimizador } from "../optimizacion/optimizador";
 //Errores
 import { Errores } from '../arbol/errores';
 //Entornos
@@ -111,6 +117,7 @@ export default {
     codemirror,
     ast: require("../components/Ast").default,
     tablaSimbolos: require("../components/TablaSimbolos").default,
+    optimizaciones: require("../components/Optimizaciones").default,
   },
   data() {
     return {
@@ -148,7 +155,8 @@ export default {
           align: "left",
         },
       ],
-      entornos: []
+      entornos: [],
+      optimizaciones: []
     };
   },
   computed: {
@@ -167,6 +175,14 @@ export default {
     /** @returns {boolean} */
     hasC3D(){
       return this.traduccion != null && this.traduccion.trim() != '';
+    },
+    /** @returns {boolean} */
+    hasDot(){
+      return this.dot != null && this.dot.trim() != '';
+    },
+    /** @returns {boolean} */
+    hasOptimizaciones(){
+      return this.optimizaciones != null && this.optimizaciones.length > 0;
     }
   },
   methods: {
@@ -189,12 +205,15 @@ export default {
     },
     optimizar(){
       try{
-        console.log(optimizacion.parse(this.traduccion));
+        const instrucciones = analizadorOp.parse(this.traduccion);
+        const optimizador = new Optimizador(instrucciones);
+        optimizador.optimizar();
+        this.traduccion = beautify_js(optimizador.getCodigo(), { indent_size: 2 });;
+        this.optimizaciones = optimizador.getOptimizaciones();
         this.notificar('info', 'Optimización realizada');
       } catch (error) {
         this.notificar("negative", error ? JSON.stringify(error) : 'Algo salió mal :(');
       }
-
     },
     traducir() {
       if (this.code.trim() == "") {
@@ -228,6 +247,7 @@ export default {
       this.traduccion = '';
       Errores.clear();
       this.entornos = [];
+      this.optimizaciones = [];
     },
     codigoEditado(){},
     copiar(){
