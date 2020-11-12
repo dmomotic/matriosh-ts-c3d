@@ -17,10 +17,11 @@ export class DecFuncion extends NodoAST{
   referencia: string;
   parametros: Variable[];
   instrucciones: NodoAST[];
+  tipo_de_arreglo: TIPO_DATO;
 
-  constructor({linea, id, tipo, referencia = null, parametros = [], instrucciones = []} : {linea: string, id: string, tipo: TIPO_DATO, referencia?: string, parametros?: Variable[], instrucciones?: NodoAST[]}){
+  constructor({linea, id, tipo, referencia = null, parametros = [], instrucciones = [], tipo_de_arreglo = null} : {linea: string, id: string, tipo: TIPO_DATO, referencia?: string, parametros?: Variable[], instrucciones?: NodoAST[], tipo_de_arreglo?: TIPO_DATO}){
     super(linea);
-    Object.assign(this, {id, tipo, referencia, parametros, instrucciones});
+    Object.assign(this, {id, tipo, referencia, parametros, instrucciones, tipo_de_arreglo});
   }
 
   calcularTamaño() : void{
@@ -71,7 +72,7 @@ export class DecFuncion extends NodoAST{
       ts_local.setVariable(parametro);
     }
     //Ajusto el tipo number a float ya que no tengo forma de identificarlo mas adelante
-    funcion = new Funcion({id: this.id, parametros: this.parametros, tamaño: Tamaño.getValor() + 1, referencia: this.referencia, tipo: this.tipo != TIPO_DATO.NUMBER ? this.tipo : TIPO_DATO.FLOAT});
+    funcion = new Funcion({id: this.id, parametros: this.parametros, tamaño: Tamaño.getValor() + 1, referencia: this.referencia, tipo: this.tipo != TIPO_DATO.NUMBER ? this.tipo : TIPO_DATO.FLOAT, tipo_de_arreglo: this.tipo_de_arreglo});
     ts.setFuncion(funcion);
     //TODO: asignar valores al control funcion
     ControlFuncion.setId(this.id);

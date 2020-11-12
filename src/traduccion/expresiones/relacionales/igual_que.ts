@@ -5,7 +5,7 @@ import { Etiqueta } from "../../generales/etiqueta";
 import { NodoAST } from "../../generales/nodoAST";
 import { TablaSimbolos } from "../../generales/tablaSimbolos";
 import { Temporal } from "../../generales/temporal";
-import { getNombreDeTipo, isTipoBoolean, isTipoNumber, isTipoString, TIPO_DATO } from "../../generales/tipos";
+import { getNombreDeTipo, isTipoBoolean, isTipoNull, isTipoNumber, isTipoString, TIPO_DATO } from "../../generales/tipos";
 import { Control } from "../../utils/control";
 import { ControlFuncion } from "../../utils/control_funcion";
 
@@ -32,6 +32,7 @@ export class IgualQue extends NodoAST{
       Errores.push(new Error({ tipo: 'semantico', linea: this.linea, descripcion: `No se pudo obtener la instancia de control para el operando derecho de la operacion IGUAL QUE` }));
       return;
     }
+
 
     //Comprobacion de tipo
     const tipo = this.getTipoResultante(control_izq.tipo, control_der.tipo);
@@ -65,10 +66,15 @@ export class IgualQue extends NodoAST{
     else if(isTipoString(control_izq.tipo) && isTipoString(control_der.tipo)){
       const temp_c1_init = Temporal.getSiguiente();
       const temp_c2_init = Temporal.getSiguiente();
-      //TODO: hacer validacion de nulls
+      const lbl_true = Etiqueta.getSiguiente();
+      const lbl_false = Etiqueta.getSiguiente();
+      verdaderas.push(lbl_true);
+      falsas.push(lbl_false);
 
       Codigo3D.add(`${temp_c1_init} = ${control_izq.temporal};`);
       Codigo3D.add(`${temp_c2_init} = ${control_der.temporal};`);
+
+      //TODO: hacer validacion de nulls
 
       const temp_c1 = Temporal.getSiguiente();
       const temp_c2 = Temporal.getSiguiente();
@@ -77,11 +83,6 @@ export class IgualQue extends NodoAST{
       Codigo3D.add(`${temp_c1} = Heap[(int)${temp_c1_init}];`);
       Codigo3D.add(`${temp_c2} = Heap[(int)${temp_c2_init}];`);
 
-      const lbl_true = Etiqueta.getSiguiente();
-      const lbl_false = Etiqueta.getSiguiente();
-      verdaderas.push(lbl_true);
-      falsas.push(lbl_false);
-
       Codigo3D.add(`if(${temp_c1} != ${temp_c2}) goto ${lbl_false};`);
       Codigo3D.add(`if(${temp_c1} == -1) goto ${lbl_true};`);
       Codigo3D.add(`${temp_c1_init} = ${temp_c1_init} + 1;`);
@@ -89,12 +90,23 @@ export class IgualQue extends NodoAST{
       Codigo3D.add(`goto ${lbl_inicio};`);
       return new Control({tipo, verdaderas, falsas});
     }
-    //Si es una comparacion string - null
+    //Para el resto de tipos
+    else {
+      const temp_c1_init = Temporal.getSiguiente();
+      const temp_c2_init = Temporal.getSiguiente();
+      const lbl_true = Etiqueta.getSiguiente();
+      const lbl_false = Etiqueta.getSiguiente();
+      verdaderas.push(lbl_true);
+      falsas.push(lbl_false);
 
-    //Si es una comparacion null - string
+      Codigo3D.add(`${temp_c1_init} = ${control_izq.temporal};`);
+      Codigo3D.add(`${temp_c2_init} = ${control_der.temporal};`);
 
-    //Si es una comparacion null - null
+      Codigo3D.add(`if(${temp_c1_init} == ${temp_c2_init}) goto ${lbl_true};`);
+      Codigo3D.add(`goto ${lbl_false};`);
 
+      return new Control({tipo, verdaderas, falsas});
+    }
   }
 
   private getTipoResultante(t1: TIPO_DATO, t2: TIPO_DATO): TIPO_DATO {
@@ -106,6 +118,9 @@ export class IgualQue extends NodoAST{
     if(t1 == TIPO_DATO.TYPE && t2 == TIPO_DATO.NULL) return TIPO_DATO.BOOLEAN;
     if(t1 == TIPO_DATO.ARRAY && t2 == TIPO_DATO.NULL) return TIPO_DATO.BOOLEAN;
     if(t1 == TIPO_DATO.STRING && t2 == TIPO_DATO.NULL) return TIPO_DATO.BOOLEAN;
+    if(t1 == TIPO_DATO.NULL && t2 == TIPO_DATO.ARRAY) return TIPO_DATO.BOOLEAN;
+    if(t1 == TIPO_DATO.NULL && t2 == TIPO_DATO.STRING) return TIPO_DATO.BOOLEAN;
+    if(t1 == TIPO_DATO.NULL && t2 == TIPO_DATO.TYPE) return TIPO_DATO.BOOLEAN;
     if(t1 == TIPO_DATO.NULL && t2 == TIPO_DATO.NULL) return TIPO_DATO.BOOLEAN;
     //Cualquier otra combinacion
     return TIPO_DATO.NULL;

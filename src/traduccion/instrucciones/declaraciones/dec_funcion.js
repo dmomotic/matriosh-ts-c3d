@@ -11,9 +11,9 @@ const tablaSimbolos_1 = require("../../generales/tablaSimbolos");
 const control_funcion_1 = require("../../utils/control_funcion");
 const tama_o_1 = require("../../utils/tama\u00F1o");
 class DecFuncion extends nodoAST_1.NodoAST {
-    constructor({ linea, id, tipo, referencia = null, parametros = [], instrucciones = [] }) {
+    constructor({ linea, id, tipo, referencia = null, parametros = [], instrucciones = [], tipo_de_arreglo = null }) {
         super(linea);
-        Object.assign(this, { id, tipo, referencia, parametros, instrucciones });
+        Object.assign(this, { id, tipo, referencia, parametros, instrucciones, tipo_de_arreglo });
     }
     calcularTamaño() {
         // for(const p in this.parametros){
@@ -57,7 +57,7 @@ class DecFuncion extends nodoAST_1.NodoAST {
             ts_local.setVariable(parametro);
         }
         //Ajusto el tipo number a float ya que no tengo forma de identificarlo mas adelante
-        funcion = new funcion_1.Funcion({ id: this.id, parametros: this.parametros, tamaño: tama_o_1.Tamaño.getValor() + 1, referencia: this.referencia, tipo: this.tipo != 1 /* NUMBER */ ? this.tipo : 7 /* FLOAT */ });
+        funcion = new funcion_1.Funcion({ id: this.id, parametros: this.parametros, tamaño: tama_o_1.Tamaño.getValor() + 1, referencia: this.referencia, tipo: this.tipo != 1 /* NUMBER */ ? this.tipo : 7 /* FLOAT */, tipo_de_arreglo: this.tipo_de_arreglo });
         ts.setFuncion(funcion);
         //TODO: asignar valores al control funcion
         control_funcion_1.ControlFuncion.setId(this.id);

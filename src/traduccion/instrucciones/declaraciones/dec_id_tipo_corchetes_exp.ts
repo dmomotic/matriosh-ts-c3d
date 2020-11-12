@@ -43,6 +43,7 @@ export class DecIdTipoCorchetesExp extends NodoAST {
 
     //Obtengo objeto de tipo Control para mi expresion
     const control_exp: Control = this.exp.traducir(ts);
+
     if (!control_exp) {
       Errores.push(new Error({ tipo: 'semantico', linea: this.linea, descripcion: `No fue posible obtener los datos necesarios para la expresion en la asignacion del id: ${this.id} ` }));
       return;

@@ -6,6 +6,7 @@ import { Funcion } from "../generales/funcion";
 import { NodoAST } from "../generales/nodoAST";
 import { TablaSimbolos } from "../generales/tablaSimbolos";
 import { Temporal } from "../generales/temporal";
+import { TIPO_DATO } from "../generales/tipos";
 import { Control } from "../utils/control";
 import { ControlFuncion } from "../utils/control_funcion";
 
@@ -75,7 +76,7 @@ export class LlamadaFuncion extends NodoAST{
     Codigo3D.add(`${pos_retorno} = P + 0;`);
     Codigo3D.add(`${temp_retorno} = Stack[(int)${pos_retorno}];`);
 
-    const control = new Control({temporal: temp_retorno, tipo: funcion.tipo, referencia: funcion.referencia });
+    const control = new Control({temporal: temp_retorno, tipo: funcion.tipo, referencia: funcion.referencia, tipo_de_arreglo: funcion.tipo_de_arreglo });
     //Regreso al ambito
     Codigo3D.add(`P = P - ${Stack.getIndex()};`);
     //Recupero los temporales guardados antes de la llamada

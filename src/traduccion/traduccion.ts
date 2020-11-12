@@ -57,6 +57,7 @@ import { ForIn } from './instrucciones/ciclos/for_in';
 import { ForOf } from './instrucciones/ciclos/for_of_';
 import { Entornos } from './generales/entornos';
 import { Optimizaciones } from '../optimizacion/optimizaciones';
+import { DecIdTipoCorchetes } from './instrucciones/declaraciones/dec_id_tipo_corchetes';
 
 export class Traduccion {
   raiz: Object;
@@ -210,6 +211,13 @@ export class Traduccion {
           const dimensiones = item['dimensiones'];
           lista_instrucciones.push(new DecIdTipoCorchetesExp(nodo.linea, reasignable, id, tipo, dimensiones, exp, type_generador));
         }
+        //{ id, tipo, type_generador?, dimensiones }
+        else if (_.has(item, 'id') && _.has(item, 'tipo') && _.has(item, 'dimensiones')) {
+          const exp = item['exp'];
+          const type_generador = item['type_generador'] ?? null;
+          const dimensiones = item['dimensiones'];
+          lista_instrucciones.push(new DecIdTipoCorchetes(nodo.linea, reasignable, id, tipo, dimensiones, type_generador));
+        }
         //{ id, tipo, exp, type_generador? }
         else if (_.has(item, 'id') && _.has(item, 'tipo') && _.has(item, 'exp')) {
           const exp = item['exp'];
@@ -252,6 +260,15 @@ export class Traduccion {
       const tipo = this.recorrer(nodo.hijos[2]);
       const exp = this.recorrer(nodo.hijos[4]);
       return { id, ...tipo, exp };
+    }
+
+    //DEC_ID_TIPO_CORCHETES  ---->  { id, tipo, type_generador?, dimensiones }
+    else if(this.soyNodo('DEC_ID_TIPO_CORCHETES', nodo)){
+      //id dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES
+      const id = nodo.hijos[0];
+      const tipo = this.recorrer(nodo.hijos[2]);
+      const dimensiones = this.recorrer(nodo.hijos[3]);
+      return { id, ...tipo, dimensiones };
     }
 
     //DEC_ID_TIPO_CORCHETES_EXP  ---->  { id, tipo, exp, type_generador?, dimensiones }
@@ -561,6 +578,20 @@ export class Traduccion {
 
           return new DecFuncion({ linea, id, tipo, referencia, instrucciones });
         }
+        case 11:
+          //function id par_izq LISTA_PARAMETROS par_der dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES llave_izq INSTRUCCIONES llave_der
+          if(this.soyNodo('LISTA_PARAMETROS', nodo.hijos[3])){
+            const parametros = this.recorrer(nodo.hijos[3]);
+            const tipo_funcion = this.recorrer(nodo.hijos[6]);
+            const dimensiones = this.recorrer(nodo.hijos[7]);
+            const instrucciones = this.recorrer(nodo.hijos[9]);
+
+            const linea = nodo.linea;
+            const tipo = tipo_funcion.tipo;
+            const referencia = tipo_funcion.type_generador;
+
+            return new DecFuncion({ linea, id, tipo: TIPO_DATO.ARRAY, referencia, parametros, instrucciones, tipo_de_arreglo: tipo});
+          }
         case 10:
           //function id par_izq LISTA_PARAMETROS par_der dos_puntos TIPO_VARIABLE_NATIVA llave_izq INSTRUCCIONES llave_der
           if (this.soyNodo('LISTA_PARAMETROS', nodo.hijos[3]) && this.soyNodo('TIPO_VARIABLE_NATIVA', nodo.hijos[6]) && this.soyNodo('INSTRUCCIONES', nodo.hijos[8])) {
@@ -573,6 +604,18 @@ export class Traduccion {
             const referencia = tipo_funcion.type_generador;
 
             return new DecFuncion({ linea, id, tipo, referencia, parametros, instrucciones });
+          }
+          //function id par_izq par_der dos_puntos TIPO_VARIABLE_NATIVA LISTA_CORCHETES llave_izq INSTRUCCIONES llave_der
+          if(this.soyNodo('TIPO_VARIABLE_NATIVA', nodo.hijos[5]) && this.soyNodo('LISTA_CORCHETES', nodo.hijos[6]) && this.soyNodo('INSTRUCCIONES', nodo.hijos[8])){
+            const tipo_funcion = this.recorrer(nodo.hijos[5]);
+            const dimensiones = this.recorrer(nodo.hijos[6]);
+            const instrucciones = this.recorrer(nodo.hijos[8]);
+
+            const linea = nodo.linea;
+            const tipo = tipo_funcion.tipo;
+            const referencia = tipo_funcion.type_generador;
+
+            return new DecFuncion({ linea, id, tipo: TIPO_DATO.ARRAY, referencia, instrucciones, tipo_de_arreglo: tipo});
           }
       }
     }
@@ -613,6 +656,15 @@ export class Traduccion {
            const referencia = tipo_variable_nativa.type_generador ?? null;
            const dimensiones = this.recorrer(nodo.hijos[3]);
            return new Variable({id, tipo: TIPO_DATO.ARRAY, reasignable, tamaño: dimensiones, tipo_de_arreglo: tipo, referencia});
+        }
+        case 6: {
+          //id dos_puntos Array menor TIPO_VARIABLE_NATIVA mayor
+          //{ tipo, type_generador? }
+          const tipo_variable_nativa = this.recorrer(nodo.hijos[4]);
+          const tipo = tipo_variable_nativa.tipo;
+          const referencia = tipo_variable_nativa.type_generador ?? null;
+          const dimensiones = 1;
+          return new Variable({id, tipo: TIPO_DATO.ARRAY, reasignable, tamaño: dimensiones, tipo_de_arreglo: tipo, referencia});
         }
       }
     }
@@ -977,6 +1029,8 @@ export class Traduccion {
       const declaracion = new DecIdTipo(linea, reasignable, id, TIPO_DATO.INT, null);
       return new ForOf(linea, id, declaracion, arr, instrucciones);
     }
+
+
 
   }
 

@@ -66,9 +66,115 @@ class Suma extends nodoAST_1.NodoAST {
                 }
                 //string + boolean
                 else if (control_izq.tipo == 0 /* STRING */ && control_der.tipo == 2 /* BOOLEAN */) {
+                    codigo3D_1.Codigo3D.addComentario('Suma string y boolean');
+                    //Capturo la posicion libre del Heap
+                    codigo3D_1.Codigo3D.add(`${temporal} = H; //Punto donde iniciara la cadena`);
+                    //TODO: hacer validación de null si fuera posible
+                    const temp_val = temporal_1.Temporal.getSiguiente();
+                    const temp_pos = temporal_1.Temporal.getSiguiente();
+                    codigo3D_1.Codigo3D.add(`${temp_pos} = ${control_izq.temporal};`);
+                    //Capturo la posicion inicial del string izquierdo
+                    const lbl_inicial = etiqueta_1.Etiqueta.getSiguiente();
+                    const lbl_true = etiqueta_1.Etiqueta.getSiguiente();
+                    const lbl_false = etiqueta_1.Etiqueta.getSiguiente();
+                    //Realizo el ciclo while para llenar el HEAP con el string izquierdo
+                    codigo3D_1.Codigo3D.add(`${lbl_inicial}:`);
+                    codigo3D_1.Codigo3D.add(`${temp_val} = Heap[(int) ${temp_pos}];`);
+                    codigo3D_1.Codigo3D.add(`if(${temp_val} != -1) goto ${lbl_true};`);
+                    codigo3D_1.Codigo3D.add(`goto ${lbl_false};`);
+                    codigo3D_1.Codigo3D.add(`${lbl_true}:`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${temp_val};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`${temp_pos} = ${temp_pos} + 1;`);
+                    codigo3D_1.Codigo3D.add(`goto ${lbl_inicial};`);
+                    codigo3D_1.Codigo3D.add(`${lbl_false}:`);
+                    codigo3D_1.Codigo3D.addComentario(`segundo string`);
+                    const lbl_true2 = etiqueta_1.Etiqueta.getSiguiente();
+                    const lbl_false2 = etiqueta_1.Etiqueta.getSiguiente();
+                    const lbl_end = etiqueta_1.Etiqueta.getSiguiente();
+                    codigo3D_1.Codigo3D.add(`if(${control_der.temporal} == 1) goto ${lbl_true2};`);
+                    codigo3D_1.Codigo3D.add(`goto ${lbl_false2};`);
+                    codigo3D_1.Codigo3D.add(`${lbl_true2}:`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${'t'.charCodeAt(0)};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${'r'.charCodeAt(0)};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${'u'.charCodeAt(0)};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${'e'.charCodeAt(0)};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`goto ${lbl_end};`);
+                    codigo3D_1.Codigo3D.add(`${lbl_false2}:`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${'f'.charCodeAt(0)};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${'a'.charCodeAt(0)};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${'l'.charCodeAt(0)};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${'s'.charCodeAt(0)};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${'e'.charCodeAt(0)};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`${lbl_end}:`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H] = -1;`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.addComentario(`Fin suma string y boolean`);
+                    return new control_1.Control({ temporal, tipo });
                 }
                 //boolean + string
                 else if (control_izq.tipo == 2 /* BOOLEAN */ && control_der.tipo == 0 /* STRING */) {
+                    //Capturo la posicion libre del Heap
+                    codigo3D_1.Codigo3D.add(`${temporal} = H; //Punto donde iniciara la cadena`);
+                    //Primer string
+                    const lbl_true2 = etiqueta_1.Etiqueta.getSiguiente();
+                    const lbl_false2 = etiqueta_1.Etiqueta.getSiguiente();
+                    const lbl_end = etiqueta_1.Etiqueta.getSiguiente();
+                    codigo3D_1.Codigo3D.add(`if(${control_izq.temporal} == 1) goto ${lbl_true2};`);
+                    codigo3D_1.Codigo3D.add(`goto ${lbl_false2};`);
+                    codigo3D_1.Codigo3D.add(`${lbl_true2}:`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${'t'.charCodeAt(0)};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${'r'.charCodeAt(0)};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${'u'.charCodeAt(0)};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${'e'.charCodeAt(0)};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`goto ${lbl_end};`);
+                    codigo3D_1.Codigo3D.add(`${lbl_false2}:`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${'f'.charCodeAt(0)};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${'a'.charCodeAt(0)};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${'l'.charCodeAt(0)};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${'s'.charCodeAt(0)};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${'e'.charCodeAt(0)};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`${lbl_end}:`);
+                    //Segundo string
+                    const temp_val = temporal_1.Temporal.getSiguiente();
+                    const temp_pos = temporal_1.Temporal.getSiguiente();
+                    codigo3D_1.Codigo3D.add(`${temp_pos} = ${control_der.temporal};`);
+                    //Capturo la posicion inicial del string izquierdo
+                    const lbl_inicial = etiqueta_1.Etiqueta.getSiguiente();
+                    const lbl_true = etiqueta_1.Etiqueta.getSiguiente();
+                    const lbl_false = etiqueta_1.Etiqueta.getSiguiente();
+                    //Realizo el ciclo while para llenar el HEAP con el string izquierdo
+                    codigo3D_1.Codigo3D.add(`${lbl_inicial}:`);
+                    codigo3D_1.Codigo3D.add(`${temp_val} = Heap[(int) ${temp_pos}];`);
+                    codigo3D_1.Codigo3D.add(`if(${temp_val} != -1) goto ${lbl_true};`);
+                    codigo3D_1.Codigo3D.add(`goto ${lbl_false};`);
+                    codigo3D_1.Codigo3D.add(`${lbl_true}:`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${temp_val};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`${temp_pos} = ${temp_pos} + 1;`);
+                    codigo3D_1.Codigo3D.add(`goto ${lbl_inicial};`);
+                    codigo3D_1.Codigo3D.add(`${lbl_false}:`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H] = -1;`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    return new control_1.Control({ temporal, tipo });
                 }
                 //string + string
                 else if (control_izq.tipo == 0 /* STRING */ && control_der.tipo == 0 /* STRING */) {

@@ -62,7 +62,7 @@ class LlamadaFuncion extends nodoAST_1.NodoAST {
         codigo3D_1.Codigo3D.addComentario(`Capturando retorno de funcion`);
         codigo3D_1.Codigo3D.add(`${pos_retorno} = P + 0;`);
         codigo3D_1.Codigo3D.add(`${temp_retorno} = Stack[(int)${pos_retorno}];`);
-        const control = new control_1.Control({ temporal: temp_retorno, tipo: funcion.tipo, referencia: funcion.referencia });
+        const control = new control_1.Control({ temporal: temp_retorno, tipo: funcion.tipo, referencia: funcion.referencia, tipo_de_arreglo: funcion.tipo_de_arreglo });
         //Regreso al ambito
         codigo3D_1.Codigo3D.add(`P = P - ${stack_1.Stack.getIndex()};`);
         //Recupero los temporales guardados antes de la llamada

@@ -248,6 +248,7 @@ export default {
       Errores.clear();
       this.entornos = [];
       this.optimizaciones = [];
+      this.dot = '';
     },
     codigoEditado(){},
     copiar(){

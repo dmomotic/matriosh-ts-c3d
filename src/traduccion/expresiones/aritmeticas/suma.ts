@@ -76,11 +76,120 @@ export class Suma extends NodoAST {
         }
         //string + boolean
         else if(control_izq.tipo == TIPO_DATO.STRING && control_der.tipo == TIPO_DATO.BOOLEAN){
+          Codigo3D.addComentario('Suma string y boolean');
+          //Capturo la posicion libre del Heap
+          Codigo3D.add(`${temporal} = H; //Punto donde iniciara la cadena`);
+          //TODO: hacer validación de null si fuera posible
+          const temp_val = Temporal.getSiguiente();
+          const temp_pos = Temporal.getSiguiente();
+          Codigo3D.add(`${temp_pos} = ${control_izq.temporal};`);
+          //Capturo la posicion inicial del string izquierdo
+          const lbl_inicial = Etiqueta.getSiguiente();
+          const lbl_true = Etiqueta.getSiguiente();
+          const lbl_false = Etiqueta.getSiguiente();
+          //Realizo el ciclo while para llenar el HEAP con el string izquierdo
+          Codigo3D.add(`${lbl_inicial}:`);
+          Codigo3D.add(`${temp_val} = Heap[(int) ${temp_pos}];`);
+          Codigo3D.add(`if(${temp_val} != -1) goto ${lbl_true};`);
+          Codigo3D.add(`goto ${lbl_false};`);
+          Codigo3D.add(`${lbl_true}:`);
+          Codigo3D.add(`Heap[(int)H]= ${temp_val};`);
+          Codigo3D.add(`H = H + 1;`);
+          Codigo3D.add(`${temp_pos} = ${temp_pos} + 1;`);
+          Codigo3D.add(`goto ${lbl_inicial};`);
+          Codigo3D.add(`${lbl_false}:`);
 
+          Codigo3D.addComentario(`segundo string`);
+          const lbl_true2 = Etiqueta.getSiguiente();
+          const lbl_false2 = Etiqueta.getSiguiente();
+          const lbl_end = Etiqueta.getSiguiente();
+          Codigo3D.add(`if(${control_der.temporal} == 1) goto ${lbl_true2};`);
+          Codigo3D.add(`goto ${lbl_false2};`);
+          Codigo3D.add(`${lbl_true2}:`);
+          Codigo3D.add(`Heap[(int)H]= ${'t'.charCodeAt(0)};`);
+          Codigo3D.add(`H = H + 1;`);
+          Codigo3D.add(`Heap[(int)H]= ${'r'.charCodeAt(0)};`);
+          Codigo3D.add(`H = H + 1;`);
+          Codigo3D.add(`Heap[(int)H]= ${'u'.charCodeAt(0)};`);
+          Codigo3D.add(`H = H + 1;`);
+          Codigo3D.add(`Heap[(int)H]= ${'e'.charCodeAt(0)};`);
+          Codigo3D.add(`H = H + 1;`);
+          Codigo3D.add(`goto ${lbl_end};`);
+          Codigo3D.add(`${lbl_false2}:`);
+          Codigo3D.add(`Heap[(int)H]= ${'f'.charCodeAt(0)};`);
+          Codigo3D.add(`H = H + 1;`);
+          Codigo3D.add(`Heap[(int)H]= ${'a'.charCodeAt(0)};`);
+          Codigo3D.add(`H = H + 1;`);
+          Codigo3D.add(`Heap[(int)H]= ${'l'.charCodeAt(0)};`);
+          Codigo3D.add(`H = H + 1;`);
+          Codigo3D.add(`Heap[(int)H]= ${'s'.charCodeAt(0)};`);
+          Codigo3D.add(`H = H + 1;`);
+          Codigo3D.add(`Heap[(int)H]= ${'e'.charCodeAt(0)};`);
+          Codigo3D.add(`H = H + 1;`);
+          Codigo3D.add(`${lbl_end}:`);
+          Codigo3D.add(`Heap[(int)H] = -1;`);
+          Codigo3D.add(`H = H + 1;`);
+          Codigo3D.addComentario(`Fin suma string y boolean`);
+          return new Control({temporal, tipo});
         }
         //boolean + string
         else if(control_izq.tipo == TIPO_DATO.BOOLEAN && control_der.tipo == TIPO_DATO.STRING){
+          //Capturo la posicion libre del Heap
+          Codigo3D.add(`${temporal} = H; //Punto donde iniciara la cadena`);
 
+          //Primer string
+          const lbl_true2 = Etiqueta.getSiguiente();
+          const lbl_false2 = Etiqueta.getSiguiente();
+          const lbl_end = Etiqueta.getSiguiente();
+          Codigo3D.add(`if(${control_izq.temporal} == 1) goto ${lbl_true2};`);
+          Codigo3D.add(`goto ${lbl_false2};`);
+          Codigo3D.add(`${lbl_true2}:`);
+          Codigo3D.add(`Heap[(int)H]= ${'t'.charCodeAt(0)};`);
+          Codigo3D.add(`H = H + 1;`);
+          Codigo3D.add(`Heap[(int)H]= ${'r'.charCodeAt(0)};`);
+          Codigo3D.add(`H = H + 1;`);
+          Codigo3D.add(`Heap[(int)H]= ${'u'.charCodeAt(0)};`);
+          Codigo3D.add(`H = H + 1;`);
+          Codigo3D.add(`Heap[(int)H]= ${'e'.charCodeAt(0)};`);
+          Codigo3D.add(`H = H + 1;`);
+          Codigo3D.add(`goto ${lbl_end};`);
+          Codigo3D.add(`${lbl_false2}:`);
+          Codigo3D.add(`Heap[(int)H]= ${'f'.charCodeAt(0)};`);
+          Codigo3D.add(`H = H + 1;`);
+          Codigo3D.add(`Heap[(int)H]= ${'a'.charCodeAt(0)};`);
+          Codigo3D.add(`H = H + 1;`);
+          Codigo3D.add(`Heap[(int)H]= ${'l'.charCodeAt(0)};`);
+          Codigo3D.add(`H = H + 1;`);
+          Codigo3D.add(`Heap[(int)H]= ${'s'.charCodeAt(0)};`);
+          Codigo3D.add(`H = H + 1;`);
+          Codigo3D.add(`Heap[(int)H]= ${'e'.charCodeAt(0)};`);
+          Codigo3D.add(`H = H + 1;`);
+
+          Codigo3D.add(`${lbl_end}:`);
+
+          //Segundo string
+          const temp_val = Temporal.getSiguiente();
+          const temp_pos = Temporal.getSiguiente();
+          Codigo3D.add(`${temp_pos} = ${control_der.temporal};`);
+          //Capturo la posicion inicial del string izquierdo
+          const lbl_inicial = Etiqueta.getSiguiente();
+          const lbl_true = Etiqueta.getSiguiente();
+          const lbl_false = Etiqueta.getSiguiente();
+          //Realizo el ciclo while para llenar el HEAP con el string izquierdo
+          Codigo3D.add(`${lbl_inicial}:`);
+          Codigo3D.add(`${temp_val} = Heap[(int) ${temp_pos}];`);
+          Codigo3D.add(`if(${temp_val} != -1) goto ${lbl_true};`);
+          Codigo3D.add(`goto ${lbl_false};`);
+          Codigo3D.add(`${lbl_true}:`);
+          Codigo3D.add(`Heap[(int)H]= ${temp_val};`);
+          Codigo3D.add(`H = H + 1;`);
+          Codigo3D.add(`${temp_pos} = ${temp_pos} + 1;`);
+          Codigo3D.add(`goto ${lbl_inicial};`);
+          Codigo3D.add(`${lbl_false}:`);
+          Codigo3D.add(`Heap[(int)H] = -1;`);
+          Codigo3D.add(`H = H + 1;`);
+
+          return new Control({temporal, tipo});
         }
         //string + string
         else if(control_izq.tipo == TIPO_DATO.STRING && control_der.tipo == TIPO_DATO.STRING){
