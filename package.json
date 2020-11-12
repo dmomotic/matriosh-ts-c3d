@@ -9,6 +9,7 @@
     "test": "echo \"No test specified\" && exit 0",
     "deploy": "gh-pages -d dist/spa"
   },
+  "homepage": "https://github.com/dmomotic/matriosh-ts-c3d",
   "dependencies": {
     "@panzoom/panzoom": "^4.3.1",
     "@quasar/extras": "^1.0.0",

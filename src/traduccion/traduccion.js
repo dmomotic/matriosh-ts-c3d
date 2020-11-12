@@ -62,6 +62,7 @@ const optimizaciones_1 = require("../optimizacion/optimizaciones");
 const dec_id_tipo_corchetes_1 = require("./instrucciones/declaraciones/dec_id_tipo_corchetes");
 const diferente_que_1 = require("./expresiones/relacionales/diferente_que");
 const arreglo_con_valores_1 = require("./expresiones/arreglo_con_valores");
+const ternario_1 = require("./instrucciones/condicionales/ternario");
 class Traduccion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
@@ -973,6 +974,15 @@ class Traduccion {
             const linea = nodo.linea;
             const declaracion = new dec_id_tipo_1.DecIdTipo(linea, reasignable, id, 6 /* INT */, null);
             return new for_of_1.ForOf(linea, id, declaracion, arr, instrucciones);
+        }
+        //TERNARIO
+        else if (this.soyNodo('TERNARIO', nodo)) {
+            //EXP interrogacion EXP dos_puntos EXP
+            const condicion = this.recorrer(nodo.hijos[0]);
+            const inst_true = this.recorrer(nodo.hijos[2]);
+            const inst_false = this.recorrer(nodo.hijos[4]);
+            const linea = nodo.linea;
+            return new ternario_1.Ternario(linea, condicion, inst_true, inst_false);
         }
     }
     /**

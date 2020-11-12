@@ -60,6 +60,7 @@ import { Optimizaciones } from '../optimizacion/optimizaciones';
 import { DecIdTipoCorchetes } from './instrucciones/declaraciones/dec_id_tipo_corchetes';
 import { DiferenteQue } from './expresiones/relacionales/diferente_que';
 import { ArregloConValores } from './expresiones/arreglo_con_valores';
+import { Ternario } from './instrucciones/condicionales/ternario';
 
 export class Traduccion {
   raiz: Object;
@@ -1043,7 +1044,16 @@ export class Traduccion {
       return new ForOf(linea, id, declaracion, arr, instrucciones);
     }
 
+    //TERNARIO
+    else if(this.soyNodo('TERNARIO', nodo)){
+      //EXP interrogacion EXP dos_puntos EXP
+      const condicion = this.recorrer(nodo.hijos[0]);
+      const inst_true = this.recorrer(nodo.hijos[2]);
+      const inst_false = this.recorrer(nodo.hijos[4]);
+      const linea = nodo.linea;
 
+      return new Ternario(linea, condicion, inst_true, inst_false);
+    }
 
   }
 
