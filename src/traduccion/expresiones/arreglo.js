@@ -27,7 +27,7 @@ class Arreglo extends nodoAST_1.NodoAST {
         }
         //Temporal para asegurar que voy a trabajar con un entero
         const tamaño = temporal_1.Temporal.getSiguiente();
-        codigo3D_1.Codigo3D.add(`${tamaño} = (int) ${control.temporal};`);
+        codigo3D_1.Codigo3D.add(`${tamaño} = ${control.temporal};`); //Aqui quite el (int)
         //Guardare en la primera posicion el tamaño del arreglo
         codigo3D_1.Codigo3D.add(`Heap[(int)H] = ${tamaño};`);
         codigo3D_1.Codigo3D.add(`H = H + 1;`);

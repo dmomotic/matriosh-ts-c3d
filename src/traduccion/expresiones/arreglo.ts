@@ -31,7 +31,7 @@ export class Arreglo extends NodoAST {
 
     //Temporal para asegurar que voy a trabajar con un entero
     const tamaño = Temporal.getSiguiente();
-    Codigo3D.add(`${tamaño} = (int) ${control.temporal};`);
+    Codigo3D.add(`${tamaño} = ${control.temporal};`); //Aqui quite el (int)
     //Guardare en la primera posicion el tamaño del arreglo
     Codigo3D.add(`Heap[(int)H] = ${tamaño};`);
     Codigo3D.add(`H = H + 1;`);

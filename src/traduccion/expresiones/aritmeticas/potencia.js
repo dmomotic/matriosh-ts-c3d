@@ -44,7 +44,7 @@ class Potencia extends nodoAST_1.NodoAST {
                 codigo3D_1.Codigo3D.addComentario('Potencia con resultado int');
                 codigo3D_1.Codigo3D.add(`${temporal} = 1;`); //Valor inicial
                 const temp_ciclo = temporal_1.Temporal.getSiguiente();
-                codigo3D_1.Codigo3D.add(`${temp_ciclo} = (int) ${control_der.temporal};`);
+                codigo3D_1.Codigo3D.add(`${temp_ciclo} = ${control_der.temporal};`); //Aqui quite el (int)
                 const lbl_ciclo = etiqueta_1.Etiqueta.getSiguiente();
                 const lbl_true = etiqueta_1.Etiqueta.getSiguiente();
                 const lbl_false = etiqueta_1.Etiqueta.getSiguiente();
@@ -53,7 +53,7 @@ class Potencia extends nodoAST_1.NodoAST {
                 codigo3D_1.Codigo3D.add(`goto ${lbl_false};`);
                 codigo3D_1.Codigo3D.add(`${lbl_true}:`);
                 const temp_redondeo = temporal_1.Temporal.getSiguiente();
-                codigo3D_1.Codigo3D.add(`${temp_redondeo} = (int)${control_izq.temporal};`);
+                codigo3D_1.Codigo3D.add(`${temp_redondeo} = ${control_izq.temporal};`); //Aqui quite el (int)
                 codigo3D_1.Codigo3D.add(`${temporal} = ${temporal} * ${temp_redondeo};`);
                 codigo3D_1.Codigo3D.add(`${temp_ciclo} = ${temp_ciclo} - 1;`);
                 codigo3D_1.Codigo3D.add(`goto ${lbl_ciclo};`);

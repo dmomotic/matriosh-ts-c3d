@@ -53,7 +53,7 @@ export class Potencia extends NodoAST {
         Codigo3D.addComentario('Potencia con resultado int');
         Codigo3D.add(`${temporal} = 1;`); //Valor inicial
         const temp_ciclo = Temporal.getSiguiente();
-        Codigo3D.add(`${temp_ciclo} = (int) ${control_der.temporal};`);
+        Codigo3D.add(`${temp_ciclo} = ${control_der.temporal};`); //Aqui quite el (int)
         const lbl_ciclo = Etiqueta.getSiguiente();
         const lbl_true = Etiqueta.getSiguiente();
         const lbl_false = Etiqueta.getSiguiente();
@@ -62,7 +62,7 @@ export class Potencia extends NodoAST {
         Codigo3D.add(`goto ${lbl_false};`);
         Codigo3D.add(`${lbl_true}:`);
         const temp_redondeo = Temporal.getSiguiente();
-        Codigo3D.add(`${temp_redondeo} = (int)${control_izq.temporal};`);
+        Codigo3D.add(`${temp_redondeo} = ${control_izq.temporal};`); //Aqui quite el (int)
         Codigo3D.add(`${temporal} = ${temporal} * ${temp_redondeo};`);
         Codigo3D.add(`${temp_ciclo} = ${temp_ciclo} - 1;`);
         Codigo3D.add(`goto ${lbl_ciclo};`);
