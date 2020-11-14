@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Suma = void 0;
 const error_1 = require("../../../arbol/error");
 const errores_1 = require("../../../arbol/errores");
+const stack_1 = require("../../estructuras/stack");
 const codigo3D_1 = require("../../generales/codigo3D");
 const etiqueta_1 = require("../../generales/etiqueta");
 const nodoAST_1 = require("../../generales/nodoAST");
@@ -60,9 +61,125 @@ class Suma extends nodoAST_1.NodoAST {
                 }
                 //int + string
                 else if (control_izq.tipo == 6 /* INT */ && control_der.tipo == 0 /* STRING */) {
+                    //Codigo para convertir int en string
+                    const temp1 = temporal_1.Temporal.getSiguiente();
+                    const temp2 = temporal_1.Temporal.getSiguiente();
+                    const temp3 = temporal_1.Temporal.getSiguiente();
+                    const temp4 = temporal_1.Temporal.getSiguiente();
+                    codigo3D_1.Codigo3D.add(`${temp1} = P + ${stack_1.Stack.getIndex()};`);
+                    codigo3D_1.Codigo3D.add(`${temp2} = ${temp1} + 2;`);
+                    codigo3D_1.Codigo3D.add(`Stack[(int)${temp2}] = ${control_izq.temporal};`);
+                    codigo3D_1.Codigo3D.add(`P = P + ${stack_1.Stack.getIndex()};`);
+                    codigo3D_1.Codigo3D.add(`int_to_string();`);
+                    codigo3D_1.Codigo3D.add(`${temp3} = P + 0;`);
+                    codigo3D_1.Codigo3D.add(`${temp4} = Stack[(int)${temp3}];`);
+                    codigo3D_1.Codigo3D.add(`P = P - ${stack_1.Stack.getIndex()};`);
+                    codigo3D_1.Codigo3D.addComentario('Suma de int y string');
+                    //Capturo la posicion libre del Heap
+                    codigo3D_1.Codigo3D.add(`${temporal} = H; //Punto donde iniciara la cadena`);
+                    //TODO: hacer validación de null si fuera posible
+                    const temp_val = temporal_1.Temporal.getSiguiente();
+                    const temp_pos = temporal_1.Temporal.getSiguiente();
+                    codigo3D_1.Codigo3D.add(`${temp_pos} = ${temp4};`);
+                    //Capturo la posicion inicial del string izquierdo
+                    const lbl_inicial = etiqueta_1.Etiqueta.getSiguiente();
+                    const lbl_true = etiqueta_1.Etiqueta.getSiguiente();
+                    const lbl_false = etiqueta_1.Etiqueta.getSiguiente();
+                    //Realizo el ciclo while para llenar el HEAP con el string izquierdo
+                    codigo3D_1.Codigo3D.add(`${lbl_inicial}:`);
+                    codigo3D_1.Codigo3D.add(`${temp_val} = Heap[(int) ${temp_pos}];`);
+                    codigo3D_1.Codigo3D.add(`if(${temp_val} != -1) goto ${lbl_true};`);
+                    codigo3D_1.Codigo3D.add(`goto ${lbl_false};`);
+                    codigo3D_1.Codigo3D.add(`${lbl_true}:`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${temp_val};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`${temp_pos} = ${temp_pos} + 1;`);
+                    codigo3D_1.Codigo3D.add(`goto ${lbl_inicial};`);
+                    codigo3D_1.Codigo3D.add(`${lbl_false}:`);
+                    codigo3D_1.Codigo3D.addComentario(`string`);
+                    //Realizo el ciclo while para llenar el HEAP con el string derecho
+                    const temp_val2 = temporal_1.Temporal.getSiguiente();
+                    const temp_pos2 = temporal_1.Temporal.getSiguiente();
+                    codigo3D_1.Codigo3D.add(`${temp_pos2} = ${control_der.temporal};`);
+                    const lbl_inicial2 = etiqueta_1.Etiqueta.getSiguiente();
+                    const lbl_true2 = etiqueta_1.Etiqueta.getSiguiente();
+                    const lbl_false2 = etiqueta_1.Etiqueta.getSiguiente();
+                    codigo3D_1.Codigo3D.add(`${lbl_inicial2}:`);
+                    codigo3D_1.Codigo3D.add(`${temp_val2} = Heap[(int) ${temp_pos2}];`);
+                    codigo3D_1.Codigo3D.add(`if(${temp_val2} != -1) goto ${lbl_true2};`);
+                    codigo3D_1.Codigo3D.add(`goto ${lbl_false2};`);
+                    codigo3D_1.Codigo3D.add(`${lbl_true2}:`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${temp_val2};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`${temp_pos2} = ${temp_pos2} + 1;`);
+                    codigo3D_1.Codigo3D.add(`goto ${lbl_inicial2};`);
+                    codigo3D_1.Codigo3D.add(`${lbl_false2}:`);
+                    //Asigno caracter de escape
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H] = -1;`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.addComentario(`Fin suma de dos string`);
+                    return new control_1.Control({ temporal, tipo });
                 }
                 //string + int
                 else if (control_izq.tipo == 0 /* STRING */ && control_der.tipo == 6 /* INT */) {
+                    //Codigo para convertir int en string
+                    const temp1 = temporal_1.Temporal.getSiguiente();
+                    const temp2 = temporal_1.Temporal.getSiguiente();
+                    const temp3 = temporal_1.Temporal.getSiguiente();
+                    const temp4 = temporal_1.Temporal.getSiguiente();
+                    codigo3D_1.Codigo3D.add(`${temp1} = P + ${stack_1.Stack.getIndex()};`);
+                    codigo3D_1.Codigo3D.add(`${temp2} = ${temp1} + 2;`);
+                    codigo3D_1.Codigo3D.add(`Stack[(int)${temp2}] = ${control_der.temporal};`);
+                    codigo3D_1.Codigo3D.add(`P = P + ${stack_1.Stack.getIndex()};`);
+                    codigo3D_1.Codigo3D.add(`int_to_string();`);
+                    codigo3D_1.Codigo3D.add(`${temp3} = P + 0;`);
+                    codigo3D_1.Codigo3D.add(`${temp4} = Stack[(int)${temp3}];`);
+                    codigo3D_1.Codigo3D.add(`P = P - ${stack_1.Stack.getIndex()};`);
+                    codigo3D_1.Codigo3D.addComentario('Suma de string e int');
+                    //Capturo la posicion libre del Heap
+                    codigo3D_1.Codigo3D.add(`${temporal} = H; //Punto donde iniciara la cadena`);
+                    //TODO: hacer validación de null si fuera posible
+                    const temp_val = temporal_1.Temporal.getSiguiente();
+                    const temp_pos = temporal_1.Temporal.getSiguiente();
+                    codigo3D_1.Codigo3D.add(`${temp_pos} = ${control_izq.temporal};`);
+                    //Capturo la posicion inicial del string izquierdo
+                    const lbl_inicial = etiqueta_1.Etiqueta.getSiguiente();
+                    const lbl_true = etiqueta_1.Etiqueta.getSiguiente();
+                    const lbl_false = etiqueta_1.Etiqueta.getSiguiente();
+                    //Realizo el ciclo while para llenar el HEAP con el string izquierdo
+                    codigo3D_1.Codigo3D.add(`${lbl_inicial}:`);
+                    codigo3D_1.Codigo3D.add(`${temp_val} = Heap[(int) ${temp_pos}];`);
+                    codigo3D_1.Codigo3D.add(`if(${temp_val} != -1) goto ${lbl_true};`);
+                    codigo3D_1.Codigo3D.add(`goto ${lbl_false};`);
+                    codigo3D_1.Codigo3D.add(`${lbl_true}:`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${temp_val};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`${temp_pos} = ${temp_pos} + 1;`);
+                    codigo3D_1.Codigo3D.add(`goto ${lbl_inicial};`);
+                    codigo3D_1.Codigo3D.add(`${lbl_false}:`);
+                    codigo3D_1.Codigo3D.addComentario(`int`);
+                    //Realizo el ciclo while para llenar el HEAP con el string derecho
+                    const temp_val2 = temporal_1.Temporal.getSiguiente();
+                    const temp_pos2 = temporal_1.Temporal.getSiguiente();
+                    codigo3D_1.Codigo3D.add(`${temp_pos2} = ${temp4};`);
+                    const lbl_inicial2 = etiqueta_1.Etiqueta.getSiguiente();
+                    const lbl_true2 = etiqueta_1.Etiqueta.getSiguiente();
+                    const lbl_false2 = etiqueta_1.Etiqueta.getSiguiente();
+                    codigo3D_1.Codigo3D.add(`${lbl_inicial2}:`);
+                    codigo3D_1.Codigo3D.add(`${temp_val2} = Heap[(int) ${temp_pos2}];`);
+                    codigo3D_1.Codigo3D.add(`if(${temp_val2} != -1) goto ${lbl_true2};`);
+                    codigo3D_1.Codigo3D.add(`goto ${lbl_false2};`);
+                    codigo3D_1.Codigo3D.add(`${lbl_true2}:`);
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H]= ${temp_val2};`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.add(`${temp_pos2} = ${temp_pos2} + 1;`);
+                    codigo3D_1.Codigo3D.add(`goto ${lbl_inicial2};`);
+                    codigo3D_1.Codigo3D.add(`${lbl_false2}:`);
+                    //Asigno caracter de escape
+                    codigo3D_1.Codigo3D.add(`Heap[(int)H] = -1;`);
+                    codigo3D_1.Codigo3D.add(`H = H + 1;`);
+                    codigo3D_1.Codigo3D.addComentario(`Fin suma de dos string`);
+                    return new control_1.Control({ temporal, tipo });
                 }
                 //string + boolean
                 else if (control_izq.tipo == 0 /* STRING */ && control_der.tipo == 2 /* BOOLEAN */) {

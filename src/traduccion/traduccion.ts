@@ -61,6 +61,7 @@ import { DecIdTipoCorchetes } from './instrucciones/declaraciones/dec_id_tipo_co
 import { DiferenteQue } from './expresiones/relacionales/diferente_que';
 import { ArregloConValores } from './expresiones/arreglo_con_valores';
 import { Ternario } from './instrucciones/condicionales/ternario';
+import { FuncionesPropias } from './utils/funciones_propias';
 
 export class Traduccion {
   raiz: Object;
@@ -91,7 +92,7 @@ export class Traduccion {
     this.reservarGlobalesEnHeap();
     Codigo3D.addInit('void main()\n{');
     Codigo3D.addInit(Codigo3D.getCodigoFunciones());
-    //Codigo3D.addInit((new FuncionesPropias()).getCodigo());
+    Codigo3D.addInit((new FuncionesPropias()).getCodigo());
     Codigo3D.add('return;');
     Codigo3D.add('}');
     this.generarEncabezado();

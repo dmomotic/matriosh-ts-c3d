@@ -63,6 +63,7 @@ const dec_id_tipo_corchetes_1 = require("./instrucciones/declaraciones/dec_id_ti
 const diferente_que_1 = require("./expresiones/relacionales/diferente_que");
 const arreglo_con_valores_1 = require("./expresiones/arreglo_con_valores");
 const ternario_1 = require("./instrucciones/condicionales/ternario");
+const funciones_propias_1 = require("./utils/funciones_propias");
 class Traduccion {
     constructor(raiz) {
         Object.assign(this, { raiz, contador: 0, dot: '' });
@@ -87,7 +88,7 @@ class Traduccion {
         this.reservarGlobalesEnHeap();
         codigo3D_1.Codigo3D.addInit('void main()\n{');
         codigo3D_1.Codigo3D.addInit(codigo3D_1.Codigo3D.getCodigoFunciones());
-        //Codigo3D.addInit((new FuncionesPropias()).getCodigo());
+        codigo3D_1.Codigo3D.addInit((new funciones_propias_1.FuncionesPropias()).getCodigo());
         codigo3D_1.Codigo3D.add('return;');
         codigo3D_1.Codigo3D.add('}');
         this.generarEncabezado();
